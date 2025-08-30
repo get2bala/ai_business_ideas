@@ -1,0 +1,70 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc; /* slate-50 */
+}
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+.filter-btn {
+     transition: all 0.2s ease-in-out;
+     border: 1px solid transparent;
+}
+.filter-btn.active {
+    background-color: #1e293b; /* slate-800 */
+    color: white;
+    border-color: #1e293b; /* slate-800 */
+}
+.filter-btn:not(.active):hover {
+    border-color: #cbd5e1; /* slate-300 */
+}
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+.modal-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.75rem;
+    width: 90%;
+    max-width: 48rem; /* lg */
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+/* Styles for rendered markdown content in modal */
+.modal-markdown h3 {
+    font-size: 1.125rem; /* text-lg */
+    font-weight: 600; /* font-semibold */
+    color: #334155; /* slate-700 */
+    margin-top: 1.5rem; /* mt-6 */
+    margin-bottom: 0.5rem; /* mb-2 */
+    border-bottom: 1px solid #e2e8f0; /* slate-200 */
+    padding-bottom: 0.5rem;
+}
+.modal-markdown p {
+    color: #475569; /* slate-600 */
+    line-height: 1.625; /* leading-relaxed */
+}
