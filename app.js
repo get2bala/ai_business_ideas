@@ -43,6 +43,11 @@ function renderApp() {
     });
 }
 
+// Re-render when favorites filter is toggled
+document.addEventListener('favoritesChange', () => {
+    renderApp();
+});
+
 // --- EVENT LISTENERS ---
 
 // Add Idea Modal logic

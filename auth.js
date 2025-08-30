@@ -53,20 +53,27 @@ export function getCurrentUser() {
 }
 
 function renderAuthUI() {
-        if (currentUser) {
-                // Show user icon (avatar) instead of email
-                authSection.innerHTML = `
-                        <button id="user-avatar-btn" class="rounded-full bg-slate-200 hover:bg-slate-300 p-2 focus:outline-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                        </button>
-                `;
-                if (addIdeaBtn) addIdeaBtn.classList.remove('hidden');
-                document.getElementById('user-avatar-btn').addEventListener('click', () => {
+    if (currentUser) {
+        // Show user icon (avatar) instead of email
+        authSection.innerHTML = ``; // clear; we'll append in order
+        // Move addIdeaBtn before avatar
+        if (addIdeaBtn) {
+            addIdeaBtn.classList.remove('hidden');
+            authSection.appendChild(addIdeaBtn);
+        }
+        const avatarBtn = document.createElement('button');
+        avatarBtn.id = 'user-avatar-btn';
+        avatarBtn.className = 'rounded-full bg-slate-200 hover:bg-slate-300 p-2 focus:outline-none';
+        avatarBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        `;
+        authSection.appendChild(avatarBtn);
+        avatarBtn.addEventListener('click', () => {
                         // Set logout modal content dynamically
-                        const email = currentUser.email || '';
-                        const name = currentUser.user_metadata && currentUser.user_metadata.full_name ? currentUser.user_metadata.full_name : '';
+            const email = currentUser.email || '';
+            const name = currentUser.user_metadata && currentUser.user_metadata.full_name ? currentUser.user_metadata.full_name : '';
                         document.getElementById('logout-modal-content').innerHTML = `
                                 <button id="logout-modal-close" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
