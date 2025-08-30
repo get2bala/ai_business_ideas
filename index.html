@@ -6,9 +6,7 @@
     <title>Innovative Business Ideas using AI & Software</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Markdown-It Library to render Markdown content -->
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -16,41 +14,65 @@
 
     <div class="container mx-auto px-4 py-8 md:py-12">
 
-        <!-- Header Section -->
-        <header class="text-center mb-10 md:mb-16">
+        <header class="text-center mb-10 md:mb-16 relative">
+            <div class="absolute top-0 right-0 mt-4 mr-4 z-20">
+                <div id="auth-section"></div>
+            </div>
             <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-2">Innovative Business Ideas</h1>
             <p class="text-lg md:text-xl text-slate-600">Leveraging AI & Software to Solve Real-World Problems</p>
         </header>
 
-        <!-- Filter Buttons -->
-        <div id="filter-container" class="flex flex-wrap justify-center gap-2 md:gap-3 mb-10">
-            <!-- Filter buttons will be dynamically inserted here -->
+        <!-- Add Idea Button (shown only when logged in) -->
+        <div class="flex justify-end mb-10">
+            <button id="add-idea-btn" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium" style="margin-right:1rem;">Add New Idea</button>
+        </div>
+        <!-- Add Idea Modal -->
+        <div id="add-idea-modal" class="modal-overlay">
+            <div class="modal-content relative max-w-xl">
+                <button id="add-idea-modal-close" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <form id="add-idea-form" class="bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-4">Add a New Idea</h2>
+                    <div class="space-y-4">
+                        <input type="text" id="idea-title" name="idea-title" placeholder="Idea Title" class="w-full p-2 border rounded" required>
+                        <textarea id="idea-summary" name="idea-summary" placeholder="Short Summary" class="w-full p-2 border rounded" required></textarea>
+                        <textarea id="idea-details" name="idea-details" placeholder="Full Details (Markdown supported)" class="w-full p-2 border rounded h-32" required></textarea>
+                        <input type="text" id="idea-tags" name="idea-tags" placeholder="Tags (comma-separated, e.g., SaaS, B2B, Health)" class="w-full p-2 border rounded" required>
+                        <input type="text" id="idea-icon" name="idea-icon" placeholder="Icon (Paste SVG code here)" class="w-full p-2 border rounded" required>
+                        <button type="submit" class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2 rounded-lg font-medium">Add Idea</button>
+                    </div>
+                </form>
+            </div>
         </div>
 
-        <!-- Ideas Grid -->
+        <div id="filter-container" class="flex flex-wrap justify-center gap-2 md:gap-3 mb-10">
+            </div>
+
         <main id="ideas-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            <!-- Loading indicator -->
             <p id="loading-indicator" class="col-span-full text-center text-slate-500">Loading ideas...</p>
         </main>
 
     </div>
 
-    <!-- Modal -->
     <div id="idea-modal" class="modal-overlay">
         <div class="modal-content relative">
-            <button id="modal-close-btn" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24" stroke="currentColor">
+                <button id="modal-close-btn" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
             <div id="modal-body">
-                <!-- Modal content will be dynamically inserted here -->
-            </div>
+                </div>
         </div>
     </div>
 
     <script src="config.js"></script>
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
+    <script type="module" src="api.js"></script>
+    <script type="module" src="auth.js"></script>
+    <script type="module" src="ui.js"></script>
 </body>
 </html>
-
