@@ -30,11 +30,12 @@ export async function fetchAutoIdea(prompt) {
         if (token) headers['Authorization'] = `Bearer ${token}`;
         // Use CORS mode explicitly so preflight behaviour is clear in browsers.
         // Note: sending an Authorization header will trigger a preflight OPTIONS request.
+        // Send both the user's text entry (promptText) and the system prompt (if available on window)
         const res = await fetch(FN_URL, {
             method: 'POST',
             mode: 'cors',
             headers,
-            body: JSON.stringify({ prompt })
+            body: JSON.stringify({ promptText: prompt, systemPrompt: (typeof window !== 'undefined' && window.SYSTEM_PROMPT) ? window.SYSTEM_PROMPT : undefined })
         });
 
         if (!res.ok) {

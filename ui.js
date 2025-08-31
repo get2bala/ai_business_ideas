@@ -345,59 +345,91 @@ document.addEventListener('generateAutoIdea', async (e) => {
 
     const body = document.getElementById('auto-idea-modal-body');
     if (!body) return;
-    // show loading
-    setAutoGenStatus('loading');
-    body.innerHTML = `<div id="auto-idea-loading" class="text-center text-slate-500">Generating idea...</div>`;
-    autoModal.classList.add('active');
+    // Helper to generate and render idea given a promptText
+    async function generateAndRender(promptText) {
+        if (!promptText || !promptText.toString().trim()) {
+            body.innerHTML = `<div class="text-center text-red-500">Please enter a description or industry to generate an idea.</div>`;
+            return;
+        }
+        const text = promptText.toString().trim();
+        // show loading
+        setAutoGenStatus('loading');
+        body.innerHTML = `<div id="auto-idea-loading" class="text-center text-slate-500">Generating idea...</div>`;
+        autoModal.classList.add('active');
 
-    try {
-        const idea = await fetchAutoIdea(prompt);
-    if (!idea) throw new Error('No idea returned');
-        // Render idea into modal
-    setAutoGenStatus('ok');
-        console.log('rendering generated idea', idea);
+        try {
+            const idea = await fetchAutoIdea(text);
+            if (!idea) throw new Error('No idea returned');
+            // Render idea into modal
+            setAutoGenStatus('ok');
+            console.log('rendering generated idea', idea);
+            body.innerHTML = `
+                <div class="mb-4 text-3xl">${idea.icon || ''}</div>
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">${idea.title || 'Untitled'}</h2>
+                <div class="text-xs text-slate-500 mb-2">Source: ${idea.__source || 'unknown'}</div>
+                <p class="text-slate-600 mb-4">${idea.summary || ''}</p>
+                <div class="prose text-slate-700 mb-4">${simpleMarkdownFallback(idea.details || '')}</div>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    ${(idea.tags || []).map(tag => `<span class="text-xs font-medium bg-slate-100 text-slate-600 px-2 py-1 rounded-full">${tag}</span>`).join('')}
+                </div>
+                <div class="flex gap-2 justify-end">
+                    <button id="auto-idea-use-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Use Idea</button>
+                    <button id="auto-idea-close-btn" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded">Close</button>
+                </div>
+            `;
+
+            // Attach handlers
+            const useBtn = document.getElementById('auto-idea-use-btn');
+            const closeBtn = document.getElementById('auto-idea-close-btn');
+            if (closeBtn) closeBtn.addEventListener('click', () => autoModal.classList.remove('active'));
+            if (useBtn) {
+                useBtn.addEventListener('click', () => {
+                    // Populate add-idea form fields (if present) and open add-idea modal
+                    const addModal = document.getElementById('add-idea-modal');
+                    const titleEl = document.getElementById('idea-title');
+                    const summaryEl = document.getElementById('idea-summary');
+                    const detailsEl = document.getElementById('idea-details');
+                    const tagsEl = document.getElementById('idea-tags');
+                    const iconEl = document.getElementById('idea-icon');
+                    if (titleEl) titleEl.value = idea.title || '';
+                    if (summaryEl) summaryEl.value = idea.summary || '';
+                    if (detailsEl) detailsEl.value = idea.details || '';
+                    if (tagsEl) tagsEl.value = (idea.tags || []).join(', ');
+                    if (iconEl) iconEl.value = idea.icon || '';
+                    // Ensure the add-idea modal is visible so user can edit/save
+                    if (addModal) addModal.classList.add('active');
+                    // Close auto modal
+                    autoModal.classList.remove('active');
+                });
+            }
+        } catch (err) {
+            setAutoGenStatus('error', err && err.message ? err.message : 'failed');
+            body.innerHTML = `<div class="text-center text-red-500">Failed to generate idea. Please try again.</div>`;
+            console.error('generateAutoIdea error', err);
+        }
+    }
+
+    // If a prompt was provided via the event, auto-generate. Otherwise show an input for the user.
+    if (!prompt) {
         body.innerHTML = `
-            <div class="mb-4 text-3xl">${idea.icon || ''}</div>
-            <h2 class="text-2xl font-bold text-slate-800 mb-2">${idea.title || 'Untitled'}</h2>
-            <div class="text-xs text-slate-500 mb-2">Source: ${idea.__source || 'unknown'}</div>
-            <p class="text-slate-600 mb-4">${idea.summary || ''}</p>
-            <div class="prose text-slate-700 mb-4">${simpleMarkdownFallback(idea.details || '')}</div>
-            <div class="flex flex-wrap gap-2 mb-4">
-                ${(idea.tags || []).map(tag => `<span class="text-xs font-medium bg-slate-100 text-slate-600 px-2 py-1 rounded-full">${tag}</span>`).join('')}
-            </div>
-            <div class="flex gap-2 justify-end">
-                <button id="auto-idea-use-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Use Idea</button>
-                <button id="auto-idea-close-btn" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded">Close</button>
+            <div class="space-y-4">
+                <input id="auto-idea-prompt" type="text" placeholder="Specify a problem or industry?" class="w-full p-2 border rounded" />
+                <div class="flex gap-2 justify-end">
+                    <button id="auto-idea-generate-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Generate</button>
+                    <button id="auto-idea-cancel-btn" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded">Close</button>
+                </div>
             </div>
         `;
-
-        // Attach handlers
-        const useBtn = document.getElementById('auto-idea-use-btn');
-        const closeBtn = document.getElementById('auto-idea-close-btn');
-        if (closeBtn) closeBtn.addEventListener('click', () => autoModal.classList.remove('active'));
-        if (useBtn) {
-            useBtn.addEventListener('click', () => {
-                // Populate add-idea form fields (if present) and open add-idea modal
-                const addModal = document.getElementById('add-idea-modal');
-                const titleEl = document.getElementById('idea-title');
-                const summaryEl = document.getElementById('idea-summary');
-                const detailsEl = document.getElementById('idea-details');
-                const tagsEl = document.getElementById('idea-tags');
-                const iconEl = document.getElementById('idea-icon');
-                if (titleEl) titleEl.value = idea.title || '';
-                if (summaryEl) summaryEl.value = idea.summary || '';
-                if (detailsEl) detailsEl.value = idea.details || '';
-                if (tagsEl) tagsEl.value = (idea.tags || []).join(', ');
-                if (iconEl) iconEl.value = idea.icon || '';
-                // Ensure the add-idea modal is visible so user can edit/save
-                if (addModal) addModal.classList.add('active');
-                // Close auto modal
-                autoModal.classList.remove('active');
-            });
-        }
-    } catch (err) {
-        setAutoGenStatus('error', err && err.message ? err.message : 'failed');
-        body.innerHTML = `<div class="text-center text-red-500">Failed to generate idea. Please try again.</div>`;
-        console.error('generateAutoIdea error', err);
+        autoModal.classList.add('active');
+        const genBtn = document.getElementById('auto-idea-generate-btn');
+        const cancelBtn = document.getElementById('auto-idea-cancel-btn');
+        const inputEl = document.getElementById('auto-idea-prompt');
+        if (cancelBtn) cancelBtn.addEventListener('click', () => autoModal.classList.remove('active'));
+        if (genBtn && inputEl) genBtn.addEventListener('click', () => generateAndRender(inputEl.value));
+        // Also support Enter key in input
+        if (inputEl) inputEl.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); generateAndRender(inputEl.value); } });
+    } else {
+        // auto-run
+        generateAndRender(prompt);
     }
 });

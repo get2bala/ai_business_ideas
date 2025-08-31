@@ -16,9 +16,11 @@ serve(async (req)=>{
   }
   try {
     // --- Environment Variable Setup ---
-    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
-    const SERVICE_ROLE_KEY = Deno.env.get('SERVICE_ROLE_KEY');
-    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+  const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+  const SERVICE_ROLE_KEY = Deno.env.get('SERVICE_ROLE_KEY');
+  const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
+  // Optional system prompt from environment
+  const SYSTEM_PROMPT_ENV = Deno.env.get('SYSTEM_PROMPT');
     // --- Environment Variable Validation ---
     if (!SUPABASE_URL || !SERVICE_ROLE_KEY || !GEMINI_API_KEY) {
       return new Response(JSON.stringify({
@@ -87,16 +89,29 @@ serve(async (req)=>{
     }
     // --- Request Body Parsing ---
     const body = await req.json().catch(()=>({}));
-    const userPrompt = body.prompt || 'Generate a concise AI business idea: title, summary, details, tags.';
+    // Expect client to pass { promptText: string, systemPrompt?: string }
+    const userPromptText = (body.promptText || '').toString().trim();
+    // Allow client to override system prompt; otherwise try env var then default
+  const clientSystemPrompt = (body.systemPrompt && body.systemPrompt.toString().trim()) || SYSTEM_PROMPT_ENV || 'You are an expert product strategist and copywriter. Respond concisely and in a structured format using the following sections: Title:, Summary:, Details:, Tags:. Keep tags to a short comma-separated list.';
+    if (!userPromptText) {
+      return new Response(JSON.stringify({ error: 'Bad Request: missing promptText in request body' }), {
+        status: 400,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      });
+    }
+
     // --- Call Google Gemini API (Corrected) ---
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
+    // Send both system and user prompts so the model receives instruction + user description.
     const payload = {
       contents: [
         {
           parts: [
-            {
-              text: userPrompt
-            }
+            { text: clientSystemPrompt },
+            { text: userPromptText }
           ]
         }
       ]

@@ -48,6 +48,13 @@ document.addEventListener('favoritesChange', () => {
     renderApp();
 });
 
+function showApp() {
+    const homeContent = document.getElementById('home-content');
+    const appContent = document.getElementById('app-content');
+    if (homeContent) homeContent.style.display = 'none';
+    if (appContent) appContent.style.display = 'block';
+}
+
 // --- EVENT LISTENERS ---
 
 // Add Idea Modal logic
@@ -82,6 +89,22 @@ if (addIdeaBtn && addIdeaModal && addIdeaModalClose && addIdeaForm) {
             addIdeaForm.reset();
             addIdeaModal.classList.remove('active');
         }
+    });
+}
+
+const forgeLegacyBtn = document.getElementById('forge-legacy-btn');
+if (forgeLegacyBtn) {
+    forgeLegacyBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showApp();
+    });
+}
+
+const startBuildingBtn = document.getElementById('start-building-btn');
+if (startBuildingBtn) {
+    startBuildingBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showApp();
     });
 }
 

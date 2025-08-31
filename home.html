@@ -3,45 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Innovative Business Ideas using AI & Software</title>
+    <title>The Genesis of Genius - AI Business Ideas</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="home_style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #1e293b; /* slate-800 */
+        }
+        .hero-bg {
+            background: linear-gradient(180deg, #f8fafc 0%, #e0f2fe 100%); /* slate-50 to sky-100 */
+            position: relative;
+            overflow: hidden;
+        }
+        .content-container {
+            position: relative;
+            z-index: 1;
+        }
+        .cta-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .cta-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+        }
+        .card {
+            background-color: white;
+            border: 1px solid #e2e8f0; /* slate-200 */
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #38bdf8; /* sky-400 */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .impact-card {
+            background: linear-gradient(145deg, white, #f0f9ff); /* white to sky-50 */
+        }
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.3), transparent);
+            margin: 4rem auto;
+        }
+        .glyph {
+            font-size: 2.5rem;
+            line-height: 1;
+            color: #0ea5e9; /* sky-500 */
+        }
+        .mobile-menu {
+            display: none;
+        }
+        .mobile-menu.active {
+            display: block;
+        }
+    </style>
 </head>
-<body>
+<body class="antialiased">
 
-    <nav class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md z-50 border-b border-slate-200/80">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <a href="#" id="nav-logo" class="text-slate-800 font-bold text-xl">Genesis AI</a>
-                </div>
-                <div class="hidden md:block">
-                    <div id="auth-section-desktop" class="ml-10 flex items-baseline space-x-4">
-                        <!-- Desktop auth links will be injected here -->
-                    </div>
-                </div>
-                <div class="md:hidden flex items-center">
-                    <button id="mobile-menu-btn" class="p-2 rounded-md text-slate-600 hover:text-slate-800 hover:bg-slate-200 focus:outline-none">
-                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <!-- Mobile menu (hidden by default) -->
-        <div id="mobile-menu" class="mobile-menu md:hidden">
-            <div id="auth-section-mobile" class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <!-- Mobile auth links will be injected here -->
-            </div>
-        </div>
-    </nav>
-    <main class="pt-16">
-    <div id="home-content" class="container mx-auto px-4 py-8 md:py-12">
+    <div id="home-content-source" style="display: none;">
         <!-- Hero Section -->
         <header class="hero-bg min-h-screen flex items-center justify-center text-center p-6 pt-16">
             <div class="content-container max-w-4xl mx-auto">
@@ -170,70 +193,43 @@
         </footer>
     </div>
 
-    <div id="app-content" class="container mx-auto px-4 py-8 md:py-12" style="display: none;">
-        <header class="mb-10 md:mb-16">
-            <div class="flex items-center justify-between">
-                <div class="flex-1">
-                    <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-2">Innovative Business Ideas</h1>
-                    <p class="text-lg md:text-xl text-slate-600 md:mx-auto">Leveraging AI & Software to Solve Real-World Problems</p>
-                </div>
-            </div>
-        </header>
-        
-        <!-- Add Idea Button (shown only when logged in) -->
-        <!-- This button has been removed as per the new flow.
-        <div class="flex justify-end mb-10">
-            <button id="add-idea-btn" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium" style="margin-right:1rem;">Add New Idea</button>
-        </div>
-        -->
-        
-        <!-- Add Idea Modal -->
-        <div id="add-idea-modal" class="modal-overlay">
-            <div class="modal-content relative max-w-xl">
-                <button id="add-idea-modal-close" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-                <form id="add-idea-form" class="bg-white p-6 rounded-lg shadow-sm">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-4">Add a New Idea</h2>
-                    <div class="space-y-4">
-                        <input type="text" id="idea-title" name="idea-title" placeholder="Idea Title" class="w-full p-2 border rounded" required>
-                        <textarea id="idea-summary" name="idea-summary" placeholder="Short Summary" class="w-full p-2 border rounded" required></textarea>
-                        <textarea id="idea-details" name="idea-details" placeholder="Full Details (Markdown supported)" class="w-full p-2 border rounded h-32" required></textarea>
-                        <input type="text" id="idea-tags" name="idea-tags" placeholder="Tags (comma-separated, e.g., SaaS, B2B, Health)" class="w-full p-2 border rounded" required>
-                        <input type="text" id="idea-icon" name="idea-icon" placeholder="Icon (Paste SVG code here)" class="w-full p-2 border rounded" required>
-                        <button type="submit" class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2 rounded-lg font-medium">Add Idea</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+    <script>
+        function initHome() {
+            const homeContentSource = document.getElementById('home-content-source');
+            if (homeContentSource) {
+                const homeContent = document.getElementById('home-content');
+                if (homeContent) {
+                    homeContent.innerHTML = homeContentSource.innerHTML;
+                }
+            }
 
-        <div id="filter-container" class="flex flex-wrap justify-center gap-2 md:gap-3 mb-10">
-            </div>
+            function showApp() {
+                document.getElementById('home-content').style.display = 'none';
+                document.getElementById('app-content').style.display = 'block';
+            }
 
-        <main id="ideas-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            <p id="loading-indicator" class="col-span-full text-center text-slate-500">Loading ideas...</p>
-        </main>
+            const forgeLegacyBtn = document.getElementById('forge-legacy-btn');
+            if (forgeLegacyBtn) {
+                forgeLegacyBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showApp();
+                });
+            }
 
-    </div>
+            const startBuildingBtn = document.getElementById('start-building-btn');
+            if (startBuildingBtn) {
+                startBuildingBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showApp();
+                });
+            }
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initHome);
+        } else {
+            initHome();
+        }
+    </script>
 
-    <div id="idea-modal" class="modal-overlay">
-        <div class="modal-content relative">
-                <button id="modal-close-btn" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-            <div id="modal-body">
-                </div>
-        </div>
-    </div>
-    </main>
-    <script src="config.js"></script>
-    <script type="module" src="app.js"></script>
-    <script type="module" src="api.js"></script>
-    <script type="module" src="auth.js"></script>
-    <script type="module" src="ui.js"></script>
 </body>
 </html>
