@@ -1,5 +1,36 @@
 // ui.js
 import * as api from './api.js';
+import { fetchAutoIdea } from './auto_idea_api.js';
+
+// Small UI indicator for automatic idea generation status
+function createAutoGenStatusIndicator() {
+    try {
+        const headerBtn = document.getElementById('mobile-menu-btn');
+        if (!headerBtn) return null;
+        // Avoid creating twice
+        if (document.getElementById('auto-gen-status')) return document.getElementById('auto-gen-status');
+        const span = document.createElement('span');
+        span.id = 'auto-gen-status';
+        span.title = 'Auto-generate status: unknown';
+        span.className = 'ml-2 inline-block w-3 h-3 rounded-full bg-gray-300';
+        headerBtn.insertAdjacentElement('afterend', span);
+        return span;
+    } catch (e) {
+        return null;
+    }
+}
+
+function setAutoGenStatus(state, message) {
+    // state: 'unknown'|'loading'|'ok'|'error'
+    const el = document.getElementById('auto-gen-status') || createAutoGenStatusIndicator();
+    if (!el) return;
+    el.title = `Auto-generate: ${state}${message ? ' - ' + message : ''}`;
+    el.classList.remove('bg-gray-300','bg-yellow-400','bg-green-500','bg-red-500');
+    if (state === 'loading') el.classList.add('bg-yellow-400');
+    else if (state === 'ok') el.classList.add('bg-green-500');
+    else if (state === 'error') el.classList.add('bg-red-500');
+    else el.classList.add('bg-gray-300');
+}
 
 // Avoid caching DOM nodes at module load (tests replace document.body).
 // Initialize markdown-it lazily inside openModal so that if the global
@@ -18,39 +49,16 @@ export function renderIdeas(ideas, activeTags, user, onIdeaDeleted) {
         document.body.dataset.currentUser = user ? String(user.id) : '';
     }
 
-    // Ensure filter container exists
-    if (filterContainer) {
-        // If user is logged in, show the "Show my favorites" toggle
-        let showBtn = document.getElementById('show-favorites-btn');
-        if (user && !showBtn) {
-            showBtn = document.createElement('button');
-            showBtn.id = 'show-favorites-btn';
-            showBtn.className = 'px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-sm';
-            showBtn.textContent = 'Show my favorites';
-            showBtn.dataset.active = 'false';
-            showBtn.addEventListener('click', () => {
-                const active = showBtn.dataset.active === 'true';
-                showBtn.dataset.active = (!active).toString();
-                showBtn.classList.toggle('bg-slate-800');
-                showBtn.classList.toggle('text-white');
-                // Inform app to re-render (app.js listens for this)
-                document.dispatchEvent(new CustomEvent('favoritesChange'));
-            });
-            filterContainer.prepend(showBtn);
-        }
-        // If no user, remove the button (logout case)
-        if (!user) {
-            const existing = document.getElementById('show-favorites-btn');
-            if (existing) existing.remove();
-        }
-    }
+    // (favorites toggle moved into the mobile hamburger menu in auth.js)
     const filteredIdeas = ideas.filter(idea => {
         if (activeTags.size === 0) return true;
         return [...activeTags].every(tag => idea.tags.includes(tag));
     });
 
     // If user wants to see only favorites, further filter here
-    const showBtn = document.getElementById('show-favorites-btn');
+    // Backwards-compatible: some code/tests expect 'mobile-favorites-toggle',
+    // the runtime UI uses 'show-favorites-btn'. Accept either.
+    const showBtn = document.getElementById('show-favorites-btn') || document.getElementById('mobile-favorites-toggle');
     const showOnlyFavorites = showBtn && showBtn.dataset.active === 'true' && user;
     // Fetch favorites for the current user from backend (async)
     const userFavorites = new Set();
@@ -304,4 +312,92 @@ document.addEventListener('click', (e) => {
         btn.classList.remove('text-red-500');
         btn.classList.add('text-gray-400');
     });
+});
+
+// --- Automatic Idea Generation: listen for requests and show modal ---
+document.addEventListener('generateAutoIdea', async (e) => {
+    // e.detail can contain a prompt string
+    const prompt = (e && e.detail && e.detail.prompt) ? e.detail.prompt : undefined;
+    // Create modal DOM if needed
+    let autoModal = document.getElementById('auto-idea-modal');
+    if (!autoModal) {
+        autoModal = document.createElement('div');
+        autoModal.id = 'auto-idea-modal';
+        autoModal.className = 'modal-overlay';
+        autoModal.innerHTML = `
+            <div class="modal-content relative max-w-xl">
+                <button id="auto-idea-modal-close" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <div id="auto-idea-modal-body" class="p-6">
+                    <div id="auto-idea-loading" class="text-center text-slate-500">Generating idea...</div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(autoModal);
+        const closeBtn = document.getElementById('auto-idea-modal-close');
+        if (closeBtn) closeBtn.addEventListener('click', () => autoModal.classList.remove('active'));
+        autoModal.addEventListener('click', (ev) => { if (ev.target === autoModal) autoModal.classList.remove('active'); });
+        document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') autoModal.classList.remove('active'); });
+    }
+
+    const body = document.getElementById('auto-idea-modal-body');
+    if (!body) return;
+    // show loading
+    setAutoGenStatus('loading');
+    body.innerHTML = `<div id="auto-idea-loading" class="text-center text-slate-500">Generating idea...</div>`;
+    autoModal.classList.add('active');
+
+    try {
+        const idea = await fetchAutoIdea(prompt);
+    if (!idea) throw new Error('No idea returned');
+        // Render idea into modal
+    setAutoGenStatus('ok');
+        console.log('rendering generated idea', idea);
+        body.innerHTML = `
+            <div class="mb-4 text-3xl">${idea.icon || ''}</div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">${idea.title || 'Untitled'}</h2>
+            <div class="text-xs text-slate-500 mb-2">Source: ${idea.__source || 'unknown'}</div>
+            <p class="text-slate-600 mb-4">${idea.summary || ''}</p>
+            <div class="prose text-slate-700 mb-4">${simpleMarkdownFallback(idea.details || '')}</div>
+            <div class="flex flex-wrap gap-2 mb-4">
+                ${(idea.tags || []).map(tag => `<span class="text-xs font-medium bg-slate-100 text-slate-600 px-2 py-1 rounded-full">${tag}</span>`).join('')}
+            </div>
+            <div class="flex gap-2 justify-end">
+                <button id="auto-idea-use-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Use Idea</button>
+                <button id="auto-idea-close-btn" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded">Close</button>
+            </div>
+        `;
+
+        // Attach handlers
+        const useBtn = document.getElementById('auto-idea-use-btn');
+        const closeBtn = document.getElementById('auto-idea-close-btn');
+        if (closeBtn) closeBtn.addEventListener('click', () => autoModal.classList.remove('active'));
+        if (useBtn) {
+            useBtn.addEventListener('click', () => {
+                // Populate add-idea form fields (if present) and open add-idea modal
+                const addModal = document.getElementById('add-idea-modal');
+                const titleEl = document.getElementById('idea-title');
+                const summaryEl = document.getElementById('idea-summary');
+                const detailsEl = document.getElementById('idea-details');
+                const tagsEl = document.getElementById('idea-tags');
+                const iconEl = document.getElementById('idea-icon');
+                if (titleEl) titleEl.value = idea.title || '';
+                if (summaryEl) summaryEl.value = idea.summary || '';
+                if (detailsEl) detailsEl.value = idea.details || '';
+                if (tagsEl) tagsEl.value = (idea.tags || []).join(', ');
+                if (iconEl) iconEl.value = idea.icon || '';
+                // Ensure the add-idea modal is visible so user can edit/save
+                if (addModal) addModal.classList.add('active');
+                // Close auto modal
+                autoModal.classList.remove('active');
+            });
+        }
+    } catch (err) {
+        setAutoGenStatus('error', err && err.message ? err.message : 'failed');
+        body.innerHTML = `<div class="text-center text-red-500">Failed to generate idea. Please try again.</div>`;
+        console.error('generateAutoIdea error', err);
+    }
 });

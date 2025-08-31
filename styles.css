@@ -68,3 +68,89 @@ body {
     color: #475569; /* slate-600 */
     line-height: 1.625; /* leading-relaxed */
 }
+
+/* Responsive tweaks for header/auth area and buttons */
+#auth-section {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+#auth-section > button,#auth-section > .rounded-full {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Make the add idea button and auth buttons fit on small screens */
+#add-idea-btn {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 640px) {
+    /* Stack header text compactly and keep auth controls to the right */
+    header .flex-1 {
+        min-width: 0;
+    }
+    header h1 {
+        font-size: 1.5rem; /* smaller on small screens */
+        margin-bottom: 0.25rem;
+    }
+    header p {
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+    #auth-section {
+        gap: 0.4rem;
+    }
+    /* Ensure the add-idea button doesn't overflow and wraps nicely */
+    #add-idea-btn {
+        margin-right: 0.5rem !important;
+        padding: 0.4rem 0.7rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    display: none; /* hide header add button on small screens; mobile menu will provide it */
+    }
+    /* Modal content should occupy most of the small screen width */
+    .modal-content {
+        width: 95%;
+        padding: 1rem;
+    }
+}
+
+/* Mobile menu styles */
+.mobile-menu {
+    position: absolute;
+    top: 4.25rem; /* below header */
+    right: 1rem;
+    background: white;
+    border: 1px solid #e6edf3;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07);
+    min-width: 12rem;
+    z-index: 60;
+    display: none;
+}
+.mobile-menu.active {
+    display: block;
+}
+.mobile-menu button {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 0.5rem 0.75rem;
+}
+.mobile-menu button:hover,
+.mobile-menu .menu-item:hover {
+    background-color: #f1f5f9; /* light slate */
+}
+.mobile-menu .menu-item.active,
+.mobile-menu button[data-active="true"] {
+    background-color: #e2e8f0; /* slightly darker when active */
+    font-weight: 600;
+}
+.mobile-menu .menu-item + .menu-item {
+    border-top: 1px solid #f1f5f9;
+}

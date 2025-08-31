@@ -14,13 +14,25 @@
 
     <div class="container mx-auto px-4 py-8 md:py-12">
 
-        <header class="text-center mb-10 md:mb-16 relative">
-            <div class="absolute top-0 right-0 mt-4 mr-4 z-20">
-                <div id="auth-section"></div>
+        <header class="mb-10 md:mb-16">
+            <div class="flex items-center justify-between">
+                <div class="flex-1">
+                    <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-2">Innovative Business Ideas</h1>
+                    <p class="text-lg md:text-xl text-slate-600 md:mx-auto">Leveraging AI & Software to Solve Real-World Problems</p>
+                </div>
+                <div id="auth-section" class="ml-4 z-20 hidden"></div>
+                <!-- Hamburger menu (used on all sizes) -->
+                <button id="mobile-menu-btn" class="ml-3 p-2 rounded-md bg-slate-100 hover:bg-slate-200 focus:outline-none" aria-label="Open menu" aria-expanded="false">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
             </div>
-            <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-2">Innovative Business Ideas</h1>
-            <p class="text-lg md:text-xl text-slate-600">Leveraging AI & Software to Solve Real-World Problems</p>
         </header>
+        <!-- Mobile menu (hidden by default) -->
+        <div id="mobile-menu" class="mobile-menu">
+            <div id="mobile-menu-content" class="p-4"></div>
+        </div>
 
         <!-- Add Idea Button (shown only when logged in) -->
         <div class="flex justify-end mb-10">
