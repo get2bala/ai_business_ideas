@@ -1,5 +1,5 @@
 // api.js
-import { db } from './app.js'; // We'll export 'db' from app.js
+import { db } from './db.js';
 
 export async function fetchIdeas() {
     const { data, error } = await db
@@ -15,20 +15,39 @@ export async function fetchIdeas() {
 }
 
 export async function addIdea(ideaData, userId) {
-    const { data, error } = await db.from('ideas').insert([{
-        title: ideaData.title,
-        summary: ideaData.summary,
-        details: ideaData.details,
-        tags: ideaData.tags,
-        icon: ideaData.icon,
-        user_id: userId
-    }]).select(); // .select() returns the new record
-
-    if (error) {
-        console.error("Error adding idea:", error.message);
+    console.log('Adding idea:', { ...ideaData, userId });
+    
+    if (!userId) {
+        console.error('Cannot add idea: No user ID provided');
         return null;
     }
-    return data[0];
+
+    try {
+        const { data, error } = await db.from('ideas').insert([{
+            title: ideaData.title,
+            summary: ideaData.summary,
+            details: ideaData.details,
+            tags: ideaData.tags,
+            icon: (ideaData.icon === undefined || ideaData.icon === '') ? null : ideaData.icon,
+            user_id: userId
+        }]).select(); // .select() returns the new record
+
+        if (error) {
+            console.error("Error adding idea:", error.message, error);
+            return null;
+        }
+        
+        try {
+            const payload = data && data[0] ? data[0] : data || null;
+            console.log('Successfully added idea:', payload ? JSON.stringify(payload, null, 2) : payload);
+        } catch (e) {
+            console.log('Successfully added idea:', data && data[0] ? data[0] : data);
+        }
+        return data[0];
+    } catch (err) {
+        console.error("Exception while adding idea:", err);
+        return null;
+    }
 }
 
 export async function deleteIdea(ideaId) {

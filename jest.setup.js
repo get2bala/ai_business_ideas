@@ -3,19 +3,22 @@
 // Mock a simple supabase-like client used by the app
 global.supabase = {
   createClient: (url, key) => {
-    // Simple mock client with auth and from() chainable API
     const auth = {
       _user: null,
-      onAuthStateChange: (cb) => {
-        // Expose a method to simulate auth changes in tests
-        global.__triggerAuth = (user) => {
-          auth._user = user;
-          cb(user ? 'SIGNED_IN' : 'SIGNED_OUT', user ? { user } : null);
-        };
+      getSession: async () => ({ data: { session: { access_token: 'test-token' } }, error: null }),
+      onAuthStateChange: (callback) => {
+        global.__authCallback = callback;
+        // Return mock unsubscribe function
+        return { data: { unsubscribe: () => {} } };
       },
-      signInWithPassword: async ({ email }) => ({ error: null }),
-      signUp: async ({ email }) => ({ error: null }),
-      signOut: async () => ({ error: null })
+      signInWithPassword: async ({ email, password }) => ({ error: null }),
+      signUp: async ({ email, password }) => ({ error: null }),
+      signOut: async () => {
+        if (global.__authCallback) {
+          global.__authCallback('SIGNED_OUT', null);
+        }
+        return { error: null };
+      }
     };
 
     const _tableData = { ideas: [] };

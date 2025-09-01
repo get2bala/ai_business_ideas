@@ -360,6 +360,8 @@ document.addEventListener('generateAutoIdea', async (e) => {
         try {
             const idea = await fetchAutoIdea(text);
             if (!idea) throw new Error('No idea returned');
+            
+            // If we get here, the request was successful
             // Render idea into modal
             setAutoGenStatus('ok');
             console.log('rendering generated idea', idea);
@@ -391,8 +393,10 @@ document.addEventListener('generateAutoIdea', async (e) => {
                     const detailsEl = document.getElementById('idea-details');
                     const tagsEl = document.getElementById('idea-tags');
                     const iconEl = document.getElementById('idea-icon');
-                    if (titleEl) titleEl.value = idea.title || '';
-                    if (summaryEl) summaryEl.value = idea.summary || '';
+                    // Clean the title and summary from any markdown markers
+                    if (titleEl) titleEl.value = (idea.title || '').replace(/\*/g, '');
+                    if (summaryEl) summaryEl.value = (idea.summary || '').replace(/\*/g, '');
+                    // Preserve markdown in details
                     if (detailsEl) detailsEl.value = idea.details || '';
                     if (tagsEl) tagsEl.value = (idea.tags || []).join(', ');
                     if (iconEl) iconEl.value = idea.icon || '';
@@ -404,30 +408,84 @@ document.addEventListener('generateAutoIdea', async (e) => {
             }
         } catch (err) {
             setAutoGenStatus('error', err && err.message ? err.message : 'failed');
-            body.innerHTML = `<div class="text-center text-red-500">Failed to generate idea. Please try again.</div>`;
+            
+            if (err.message === 'Authentication required') {
+                body.innerHTML = `
+                    <div class="text-center">
+                        <div class="text-red-500 mb-4">Please log in to generate ideas.</div>
+                        <button id="auto-idea-login-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Log In</button>
+                    </div>`;
+                const loginBtn = document.getElementById('auto-idea-login-btn');
+                if (loginBtn) {
+                    loginBtn.addEventListener('click', () => {
+                        const loginModal = document.getElementById('login-modal');
+                        if (loginModal) loginModal.classList.add('active');
+                        autoModal.classList.remove('active');
+                    });
+                }
+            } else {
+                body.innerHTML = `<div class="text-center text-red-500">Failed to generate idea. Please try again.</div>`;
+            }
             console.error('generateAutoIdea error', err);
         }
     }
 
-    // If a prompt was provided via the event, auto-generate. Otherwise show an input for the user.
+    // If a prompt was provided via the event, auto-generate. Otherwise show options to the user.
     if (!prompt) {
         body.innerHTML = `
-            <div class="space-y-4">
-                <input id="auto-idea-prompt" type="text" placeholder="Specify a problem or industry?" class="w-full p-2 border rounded" />
-                <div class="flex gap-2 justify-end">
-                    <button id="auto-idea-generate-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Generate</button>
+            <div class="space-y-6">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4 text-center">Create New Idea</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- AI Generation Option -->
+                    <div class="p-6 border rounded-lg hover:border-blue-500 cursor-pointer transition-all" id="ai-generation-option">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">AI Generated</h3>
+                        <p class="text-slate-600 mb-4">Let AI help you generate a comprehensive business idea based on your input.</p>
+                        <input id="auto-idea-prompt" type="text" placeholder="Specify a problem or industry?" class="w-full p-2 border rounded mb-4" />
+                        <button id="auto-idea-generate-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Generate with AI</button>
+                    </div>
+                    
+                    <!-- Manual Entry Option -->
+                    <div class="p-6 border rounded-lg hover:border-blue-500 cursor-pointer transition-all" id="manual-entry-option">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Manual Entry</h3>
+                        <p class="text-slate-600 mb-4">Create your own business idea with our structured template.</p>
+                        <button id="manual-entry-btn" class="w-full bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded">Create Manually</button>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-4">
                     <button id="auto-idea-cancel-btn" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded">Close</button>
                 </div>
             </div>
         `;
         autoModal.classList.add('active');
         const genBtn = document.getElementById('auto-idea-generate-btn');
+        const manualBtn = document.getElementById('manual-entry-btn');
         const cancelBtn = document.getElementById('auto-idea-cancel-btn');
         const inputEl = document.getElementById('auto-idea-prompt');
+        
         if (cancelBtn) cancelBtn.addEventListener('click', () => autoModal.classList.remove('active'));
-        if (genBtn && inputEl) genBtn.addEventListener('click', () => generateAndRender(inputEl.value));
-        // Also support Enter key in input
-        if (inputEl) inputEl.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); generateAndRender(inputEl.value); } });
+        
+        // AI Generation option
+        if (genBtn && inputEl) {
+            genBtn.addEventListener('click', () => generateAndRender(inputEl.value));
+            // Also support Enter key in input
+            inputEl.addEventListener('keydown', (ev) => { 
+                if (ev.key === 'Enter') { 
+                    ev.preventDefault(); 
+                    generateAndRender(inputEl.value); 
+                } 
+            });
+        }
+        
+        // Manual Entry option
+        if (manualBtn) {
+            manualBtn.addEventListener('click', () => {
+                const addModal = document.getElementById('add-idea-modal');
+                if (addModal) {
+                    addModal.classList.add('active');
+                    autoModal.classList.remove('active');
+                }
+            });
+        }
     } else {
         // auto-run
         generateAndRender(prompt);

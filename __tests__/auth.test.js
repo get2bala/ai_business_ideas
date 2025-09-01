@@ -1,17 +1,24 @@
-import { initAuth, getCurrentUser } from '../auth.js';
+import { getCurrentUser, initAuth } from '../auth.js';
+import { triggerAuthStateChange, createTestUser } from './test-utils.js';
 
 describe('auth module', () => {
-  test('getCurrentUser initially null and initAuth triggers callback on change', async () => {
-    let callbackUser = undefined;
-    await initAuth((user) => { callbackUser = user; });
-    expect(getCurrentUser()).toBeNull();
+  beforeEach(() => {
+    // Reset any mocked state
+    if (global.__authCallback) {
+      delete global.__authCallback;
+    }
+  });
 
-    // Trigger auth change using the global helper from jest.setup.js
-    const fakeUser = { id: 'u1', email: 'a@b.com' };
-    global.__triggerAuth(fakeUser);
-    // allow microtask queue to flush
-    await new Promise(res => setTimeout(res, 0));
-    expect(callbackUser).toEqual(fakeUser);
-    expect(getCurrentUser()).toEqual(fakeUser);
+  test('getCurrentUser initially null and initAuth triggers callback on change', async () => {
+    const onAuthChange = jest.fn();
+    await initAuth(onAuthChange);
+    
+    expect(getCurrentUser()).toBe(null);
+    
+    const testUser = createTestUser();
+    triggerAuthStateChange(testUser);
+    
+    expect(getCurrentUser()).toEqual(testUser);
+    expect(onAuthChange).toHaveBeenCalledWith(testUser);
   });
 });

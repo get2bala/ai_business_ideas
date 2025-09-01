@@ -1,5 +1,5 @@
 // auth.js
-import { db } from './app.js';
+import { db } from './db.js';
 
 let currentUser = null;
 

@@ -1,5 +1,7 @@
 /** @jest-environment jsdom */
 import { initAuth } from '../auth.js';
+import { triggerAuthStateChange, createTestUser } from './test-utils.js';
+import { db } from '../db.js';
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -14,18 +16,20 @@ beforeEach(() => {
 });
 
 describe('mobile menu integration', () => {
+  beforeEach(() => {
+    // Reset any mocked state
+    if (global.__authCallback) {
+      delete global.__authCallback;
+    }
+  });
+
   test('login menu item opens login modal', async () => {
-    // Simulate logged-out state
     await initAuth(() => {});
-    // Global trigger to mark logged out
-    global.__triggerAuth(null);
+    triggerAuthStateChange(null); // logged out state
     
     const loginButton = document.getElementById('login-btn-mobile');
-    
-    // The button should be rendered by initAuth/renderAuthUI
     expect(loginButton).not.toBeNull();
 
-    // Clicking login should open login modal
     loginButton.click();
     const loginModal = document.getElementById('login-modal');
     expect(loginModal.classList.contains('active')).toBe(true);
@@ -33,33 +37,34 @@ describe('mobile menu integration', () => {
 
   test('profile menu opens logout modal and logout calls signOut', async () => {
     await initAuth(() => {});
-    const fakeUser = { id: 'u1', email: 'me@test.com' };
-    global.__triggerAuth(fakeUser);
-    await new Promise(r => setTimeout(r, 0));
+    const testUser = createTestUser();
+    triggerAuthStateChange(testUser);
 
-    // Find the profile/menu item
+    // Find the profile menu item
     const profileBtn = document.getElementById('profile-menu-mobile');
     expect(profileBtn).not.toBeNull();
     profileBtn.click();
-    // logout modal should be active
+    
+    // Logout modal should be active
     const logoutModal = document.getElementById('logout-modal');
     expect(logoutModal.classList.contains('active')).toBe(true);
-    // Spy on signOut on the actual db instance used by the app
-    const { db } = await import('../app.js');
+    
+    // Spy on signOut
     const signOutSpy = jest.spyOn(db.auth, 'signOut');
-    // Click the logout button in modal
+    
+    // Click the logout button
     const logoutBtn = document.getElementById('logout-btn-modal');
     expect(logoutBtn).not.toBeNull();
     await logoutBtn.click();
+    
     expect(signOutSpy).toHaveBeenCalled();
     signOutSpy.mockRestore();
   });
 
   test('generate idea menu item dispatches generateAutoIdea event', async () => {
     await initAuth(() => {});
-    const fakeUser = { id: 'u1', email: 'a@b.com' };
-    global.__triggerAuth(fakeUser);
-    await new Promise(r => setTimeout(r, 0));
+    const testUser = createTestUser();
+    triggerAuthStateChange(testUser);
 
     const generateBtn = document.getElementById('generate-idea-menu-mobile');
     expect(generateBtn).not.toBeNull();

@@ -13,17 +13,19 @@ export async function fetchAutoIdea(prompt) {
     }
 
     try {
-        // Try to get a Supabase access token from the client-side db if available.
+        // Get access token from db.js directly
         let token = null;
         try {
-            const mod = await import('./app.js');
-            const db = mod.db;
-            if (db && db.auth && typeof db.auth.getSession === 'function') {
-                const sess = await db.auth.getSession();
-                token = sess && sess.data && sess.data.session ? sess.data.session.access_token : null;
+            const { db } = await import('./db.js');
+            const { data: { session }, error } = await db.auth.getSession();
+            if (error) {
+                console.error('Error getting auth session:', error);
+            } else {
+                token = session?.access_token;
             }
         } catch (e) {
-            // ignore — we'll call function without token (function will reject if required)
+            console.error('Error accessing auth:', e);
+            // We'll still try to call the function, it will return 401 if auth is required
         }
 
         const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
@@ -39,9 +41,16 @@ export async function fetchAutoIdea(prompt) {
         });
 
         if (!res.ok) {
-            // If function returns auth/quota errors or CORS issues, surface fallback to local generator
-            console.warn('Auto idea function returned non-OK status', res.status, await res.text().catch(() => 'no body'));
-            return await generateIdea(prompt);
+            const errorText = await res.text().catch(() => 'no body');
+            if (res.status === 401) {
+                console.warn('Authentication required. Please log in to generate ideas.');
+                const loginModal = document.getElementById('login-modal');
+                if (loginModal) loginModal.classList.add('active');
+                throw new Error('Authentication required');
+            } else {
+                console.warn(`Auto idea function returned ${res.status}:`, errorText);
+                return await generateIdea(prompt);
+            }
         }
         const json = await res.json();
         if (json && json.idea) {
