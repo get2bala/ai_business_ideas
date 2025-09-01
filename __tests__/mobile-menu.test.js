@@ -1,6 +1,6 @@
 /** @jest-environment jsdom */
 import { initAuth } from '../auth.js';
-import { triggerAuthStateChange, createTestUser } from './test-utils.js';
+import { triggerAuthStateChange, createTestUser } from '../test-utils';
 import { db } from '../db.js';
 
 beforeEach(() => {

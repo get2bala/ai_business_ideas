@@ -1,20 +1,19 @@
-// test-utils.js
-export function triggerAuthStateChange(user = null) {
-    if (global.__authCallback) {
-        global.__authCallback(
-            user ? 'SIGNED_IN' : 'SIGNED_OUT',
-            user ? { user } : null
-        );
-    }
-}
+import { triggerAuthStateChange, createTestUser } from '../test-utils';
 
-// Helper to create a test user object
-export function createTestUser(email = 'test@example.com') {
-    return {
-        id: 'test-user-id',
-        email,
-        user_metadata: {
-            full_name: 'Test User'
-        }
-    };
-}
+describe('moved test-utils (duplicate safe)', () => {
+    test('createTestUser basic shape', () => {
+        const u = createTestUser('x@y.com');
+        expect(u.email).toBe('x@y.com');
+        expect(u.user_metadata.full_name).toBe('Test User');
+    });
+
+    test('triggerAuthStateChange calls global callback when set', () => {
+        const cb = jest.fn();
+        global.__authCallback = cb;
+        triggerAuthStateChange({ id: 'u' });
+        expect(cb).toHaveBeenCalledWith('SIGNED_IN', { user: { id: 'u' } });
+        triggerAuthStateChange(null);
+        expect(cb).toHaveBeenCalledWith('SIGNED_OUT', null);
+        delete global.__authCallback;
+    });
+});

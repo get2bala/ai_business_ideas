@@ -1,5 +1,5 @@
 import { getCurrentUser, initAuth } from '../auth.js';
-import { triggerAuthStateChange, createTestUser } from './test-utils.js';
+import { triggerAuthStateChange, createTestUser } from '../test-utils';
 
 describe('auth module', () => {
   beforeEach(() => {

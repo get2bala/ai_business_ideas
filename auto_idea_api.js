@@ -29,6 +29,13 @@ export async function fetchAutoIdea(prompt) {
         }
 
         const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+        if (!token) {
+            // No logged-in user detected — prompt the user to sign in before calling an auth-protected function
+            console.warn('No auth token found. Prompting user to sign in before calling generate function.');
+            const loginModal = typeof document !== 'undefined' ? document.getElementById('login-modal') : null;
+            if (loginModal) loginModal.classList.add('active');
+            throw new Error('Authentication required');
+        }
         if (token) headers['Authorization'] = `Bearer ${token}`;
         // Use CORS mode explicitly so preflight behaviour is clear in browsers.
         // Note: sending an Authorization header will trigger a preflight OPTIONS request.
