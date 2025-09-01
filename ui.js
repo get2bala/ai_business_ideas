@@ -205,8 +205,8 @@ function openModal(idea) {
     // minimal markdown-to-HTML converter (very small subset) to keep tests
     // and environments without the CDN script working.
     const md = (typeof window !== 'undefined' && window.markdownit) ? window.markdownit() : null;
-    const renderedDetails = md ? md.render(idea.details || '') : simpleMarkdownFallback(idea.details || '');
-
+    // const renderedDetails = md ? md.render(idea.details || '') : simpleMarkdownFallback(idea.details || '');
+const renderedDetails = md ? md.render(idea.details || '') : markdownParser(idea.details || '');
     modalBody.innerHTML = `
         <div class="p-4">
             <div class="mb-4">${idea.icon}</div>
@@ -223,20 +223,58 @@ function openModal(idea) {
 
 }
 
-function simpleMarkdownFallback(mdText) {
-    // Very small and safe fallback: escape HTML and convert double newlines to paragraphs
+// ui.js
+
+function markdownParser(mdText) {
+    // A helper to escape basic HTML to prevent security issues
     const escapeHtml = (str) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const escaped = escapeHtml(mdText);
-    // Convert headings (# ...), bold (**text**), italics (*text*), and paragraphs
-    let out = escaped
-        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-        .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/gim, '<em>$1</em>')
-        .replace(/\n{2,}/gim, '</p><p>');
-    out = `<p>${out}</p>`;
-    return out;
+    
+    const lines = escapeHtml(mdText).split('\n');
+    
+    let html = '';
+    let inParagraph = false;
+
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+
+        // Process inline styles like bold/italics
+        line = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                   .replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+        // Handle headings
+        if (line.startsWith('## ')) {
+            if (inParagraph) { // Close any open paragraph before the heading
+                html += '</p>\n';
+                inParagraph = false;
+            }
+            html += `<h2>${line.substring(3)}</h2>\n`;
+        } else if (line.trim() === '') {
+            // Empty line signifies a paragraph break
+            if (inParagraph) {
+                html += '</p>\n';
+                inParagraph = false;
+            }
+        } else {
+            // Line is part of a paragraph
+            if (!inParagraph) {
+                html += '<p>';
+                inParagraph = true;
+            }
+            
+            // Add the line content. Add a line break if it's not the last line of the paragraph.
+            html += line;
+            if (inParagraph && (i + 1 < lines.length && lines[i+1].trim() !== '' && !lines[i+1].startsWith('## '))) {
+                html += '<br>';
+            }
+        }
+    }
+
+    // After the loop, close the last paragraph if it's still open
+    if (inParagraph) {
+        html += '</p>\n';
+    }
+
+    return html;
 }
 
 // Favorites helpers (simple localStorage-backed per-user favorites)
@@ -370,7 +408,7 @@ document.addEventListener('generateAutoIdea', async (e) => {
                 <h2 class="text-2xl font-bold text-slate-800 mb-2">${idea.title || 'Untitled'}</h2>
                 <div class="text-xs text-slate-500 mb-2">Source: ${idea.__source || 'unknown'}</div>
                 <p class="text-slate-600 mb-4">${idea.summary || ''}</p>
-                <div class="prose text-slate-700 mb-4">${simpleMarkdownFallback(idea.details || '')}</div>
+                <div class="prose text-slate-700 mb-4">${markdownParser(idea.details || '')}</div>
                 <div class="flex flex-wrap gap-2 mb-4">
                     ${(idea.tags || []).map(tag => `<span class="text-xs font-medium bg-slate-100 text-slate-600 px-2 py-1 rounded-full">${tag}</span>`).join('')}
                 </div>
