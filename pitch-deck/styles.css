@@ -1,0 +1,126 @@
+:root {
+  /* Theme variables will be set via JavaScript */
+  --primary-color: #2563eb;
+  --secondary-color: #1e40af;
+  --background-color: #f8fafc;
+  --text-color: #1e293b;
+  --accent-color: #3b82f6;
+  --font-family: 'Inter', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  background-color: #f0f2f5;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.theme-selector {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: var(--background-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.theme-selector select {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--accent-color);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: var(--font-family);
+}
+
+.slide {
+  min-height: 500px;
+  padding: 2rem;
+  margin: 1rem 0;
+  border-radius: 8px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.title-slide {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.title-slide h1 {
+  color: var(--primary-color);
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.title-slide h2 {
+  color: var(--secondary-color);
+  font-size: 1.5rem;
+}
+
+.problem-slide h2,
+.solution-slide h2,
+.market-slide h2,
+.business-model-slide h2 {
+  color: var(--primary-color);
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.point-list {
+  list-style: none;
+  padding: 0;
+}
+
+.point-list li {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.point-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--accent-color);
+}
+
+.statistics {
+  margin-top: 2rem;
+  color: var(--secondary-color);
+}
+
+.market-size {
+  font-size: 1.5rem;
+  color: var(--accent-color);
+  text-align: center;
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+
+.growth-potential {
+  margin-top: 2rem;
+  color: var(--secondary-color);
+  font-style: italic;
+}
+
+.business-model-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .business-model-grid {
+    grid-template-columns: 1fr;
+  }
+}
