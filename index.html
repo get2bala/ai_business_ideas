@@ -108,14 +108,49 @@
     </main>
     <script src="config.js"></script>
     <script>
-        // Load the home partial and inject into #home-content
+        // Load the home partial and inject into #home-content, executing any scripts inside the partial
         (async function(){
             try{
                 const resp = await fetch('components/home.html');
                 if(!resp.ok) throw new Error('Failed to load home partial');
                 const html = await resp.text();
                 const container = document.getElementById('home-content');
-                container.innerHTML = html;
+
+                // Parse the HTML into a temporary container
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+
+                // Collect executable scripts (external or JS/module) and remove them from temp so they are not duplicated
+                const scriptNodes = Array.from(temp.querySelectorAll('script'));
+                const execScripts = [];
+                scriptNodes.forEach(function(s) {
+                    var t = s.type && s.type.toLowerCase();
+                    var isExecutable = s.src || t === 'module' || !t || t === 'text/javascript';
+                    if (isExecutable) {
+                        execScripts.push({ src: s.src, type: s.type, text: s.textContent });
+                        s.parentNode.removeChild(s);
+                    }
+                });
+
+                // Move remaining nodes into the real container (this keeps non-executable scripts like application/json)
+                while (temp.firstChild) {
+                    container.appendChild(temp.firstChild);
+                }
+
+                // Now append and execute the collected executable scripts in order
+                execScripts.forEach(function(s) {
+                    var newS = document.createElement('script');
+                    if (s.type) newS.type = s.type;
+                    if (s.src) {
+                        newS.src = s.src;
+                        newS.async = false;
+                    } else {
+                        newS.textContent = s.text || '';
+                    }
+                    // Append to container so scripts run in page context
+                    container.appendChild(newS);
+                });
+
             }catch(e){
                 console.error(e);
                 const ph = document.getElementById('home-placeholder');

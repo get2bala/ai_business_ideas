@@ -1,0 +1,29 @@
+{
+  "gov_spending": {
+    "year": 2023,
+    "note": "Percent shares are presented for quick visualization. Please verify exact dollar amounts or categories against the OMB Historical Tables (link below).",
+    "source": "https://www.whitehouse.gov/omb/historical-tables/",
+    "items": [
+      { "label": "Social Security", "share": 24 },
+      { "label": "Healthcare (Medicare/Medicaid)", "share": 25 },
+      { "label": "Defense", "share": 15 },
+      { "label": "Net Interest", "share": 8 },
+      { "label": "Education", "share": 6 },
+      { "label": "Other", "share": 22 }
+    ]
+  },
+  "household_spending": {
+    "year": 2023,
+    "note": "Percent of average annual expenditures allocated by category. Please verify against BLS Consumer Expenditure Survey (CEX) calendar-year tables.",
+    "source": "https://www.bls.gov/cex/",
+    "items": [
+      { "label": "Housing", "share": 33 },
+      { "label": "Transportation", "share": 16 },
+      { "label": "Food", "share": 13 },
+      { "label": "Healthcare", "share": 8 },
+      { "label": "Entertainment", "share": 5 },
+      { "label": "Savings & Investments", "share": 10 },
+      { "label": "Other", "share": 15 }
+    ]
+  }
+}

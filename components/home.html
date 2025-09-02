@@ -309,6 +309,124 @@
     </section>
 
     <!-- Final Call to Action Section -->
+        <!-- Data Visualizations: Government & Household Spending -->
+        <section class="py-12 px-6 bg-white">
+                <div class="max-w-6xl mx-auto">
+                        <div class="text-center mb-8">
+                                <h2 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Public & Household Spending — Quick Visuals</h2>
+                                <p class="mt-2 text-sm text-slate-500">Snapshot charts showing government spending by sector and how U.S. households allocate income.</p>
+                        </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="p-6 bg-white border border-slate-100 rounded-lg shadow-sm">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-4">Government Spending by Sector (2023)</h3>
+                    <div id="gov-spend-table" class="text-sm"></div>
+                    <div class="mt-3 text-xs text-slate-500">Source: <a href="/data/spending_2023.json">Local data file (sourced from OMB Historical Tables)</a></div>
+                </div>
+
+                <div class="p-6 bg-white border border-slate-100 rounded-lg shadow-sm">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-4">U.S. Household Income Allocation (2023)</h3>
+                    <div id="household-spend-table" class="text-sm"></div>
+                    <div class="mt-3 text-xs text-slate-500">Source: <a href="/data/spending_2023.json">Local data file (sourced from BLS CEX)</a></div>
+                </div>
+            </div>
+                </div>
+        </section>
+
+        <!-- Inline JSON fallback to ensure data is available even when static fetch fails -->
+        <script id="spending-data" type="application/json">
+{
+  "gov_spending": {
+    "year": 2023,
+    "note": "Percent shares are presented for quick visualization. Please verify exact dollar amounts or categories against the OMB Historical Tables (link below).",
+    "source": "https://www.whitehouse.gov/omb/historical-tables/",
+    "items": [
+      { "label": "Social Security", "share": 24 },
+      { "label": "Healthcare (Medicare/Medicaid)", "share": 25 },
+      { "label": "Defense", "share": 15 },
+      { "label": "Net Interest", "share": 8 },
+      { "label": "Education", "share": 6 },
+      { "label": "Other", "share": 22 }
+    ]
+  },
+  "household_spending": {
+    "year": 2023,
+    "note": "Percent of average annual expenditures allocated by category. Please verify against BLS Consumer Expenditure Survey (CEX) calendar-year tables.",
+    "source": "https://www.bls.gov/cex/",
+    "items": [
+      { "label": "Housing", "share": 33 },
+      { "label": "Transportation", "share": 16 },
+      { "label": "Food", "share": 13 },
+      { "label": "Healthcare", "share": 8 },
+      { "label": "Entertainment", "share": 5 },
+      { "label": "Savings & Investments", "share": 10 },
+      { "label": "Other", "share": 15 }
+    ]
+  }
+}
+        </script>
+
+        <!-- Data render script: prefer inline JSON then fall back to fetching the local JSON file -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                (function () {
+                    function showFetchError() {
+                        var msg = '<div class="text-sm text-rose-600">Data not available. You can view the raw JSON <a class="underline" href="/data/spending_2023.json">here</a> if the server is running.</div>';
+                        document.getElementById('gov-spend-table').innerHTML = msg;
+                        document.getElementById('household-spend-table').innerHTML = msg;
+                    }
+
+                    function renderTables(data) {
+                        try {
+                            var gov = data.gov_spending || { items: [] };
+                            var govHtml = '<table class="w-full table-auto text-left"><thead><tr><th class="pb-2">Category</th><th class="pb-2">Share (%)</th></tr></thead><tbody>';
+                            gov.items.forEach(function (it) {
+                                govHtml += '<tr><td class="py-2 border-t border-slate-100">' + it.label + '</td><td class="py-2 border-t border-slate-100 font-semibold text-sky-600">' + it.share + '%</td></tr>';
+                            });
+                            govHtml += '</tbody></table>';
+                            document.getElementById('gov-spend-table').innerHTML = govHtml;
+
+                            var hh = data.household_spending || { items: [] };
+                            var hhHtml = '<table class="w-full table-auto text-left"><thead><tr><th class="pb-2">Category</th><th class="pb-2">Share (%)</th></tr></thead><tbody>';
+                            hh.items.forEach(function (it) {
+                                hhHtml += '<tr><td class="py-2 border-t border-slate-100">' + it.label + '</td><td class="py-2 border-t border-slate-100 font-semibold text-sky-600">' + it.share + '%</td></tr>';
+                            });
+                            hhHtml += '</tbody></table>';
+                            document.getElementById('household-spend-table').innerHTML = hhHtml;
+                        } catch (e) {
+                            console.error('Render error', e);
+                            showFetchError();
+                        }
+                    }
+
+                    // Prefer inline JSON if present
+                    var inline = document.getElementById('spending-data');
+                    if (inline) {
+                        try {
+                            var parsed = JSON.parse(inline.textContent || inline.innerText);
+                            renderTables(parsed);
+                            return;
+                        } catch (e) {
+                            console.error('Invalid inline JSON', e);
+                        }
+                    }
+
+                    // Fall back to fetching the local JSON file
+                    var triedPaths = ['/data/spending_2023.json', 'data/spending_2023.json'];
+                    (function tryNext(i) {
+                        if (i >= triedPaths.length) { showFetchError(); return; }
+                        var p = triedPaths[i];
+                        fetch(p, { cache: 'no-cache' })
+                            .then(function (res) {
+                                if (!res.ok) { throw new Error('not ok'); }
+                                return res.json();
+                            })
+                            .then(function (json) { renderTables(json); })
+                            .catch(function () { tryNext(i + 1); });
+                    })(0);
+                })();
+            });
+        </script>
     <section class="py-16 md:py-20 px-6 text-center bg-slate-50">
         <div class="max-w-3xl mx-auto">
             <h2 class="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter mb-6">
