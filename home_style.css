@@ -97,3 +97,24 @@ body {
 @media (max-width:768px){
   .feature-card{padding:1rem}
 }
+
+/* Reduce vertical spacing between content sections on the home page */
+.content-container > section {
+  padding-top: 2rem !important;    /* tighten from large utility classes */
+  padding-bottom: 2rem !important;
+}
+
+/* Reduce heavy divider spacing */
+.section-divider {
+  margin: 2rem auto !important;
+}
+
+/* Slightly reduce heading spacing inside sections */
+.content-container h2 {
+  margin-bottom: 0.6rem !important;
+}
+
+/* Reduce final CTA vertical gap */
+.content-container .cta-button {
+  margin-top: 0.5rem;
+}
