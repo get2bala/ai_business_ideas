@@ -111,6 +111,7 @@
         // Load the home partial and inject into #home-content, executing any scripts inside the partial
         (async function(){
             try{
+
                 const resp = await fetch('components/home.html');
                 if(!resp.ok) throw new Error('Failed to load home partial');
                 const html = await resp.text();
@@ -136,6 +137,10 @@
                 while (temp.firstChild) {
                     container.appendChild(temp.firstChild);
                 }
+
+                // Remove the loading placeholder if present
+                const ph = document.getElementById('home-placeholder');
+                if (ph && ph.parentNode) ph.parentNode.removeChild(ph);
 
                 // Now append and execute the collected executable scripts in order
                 execScripts.forEach(function(s) {
