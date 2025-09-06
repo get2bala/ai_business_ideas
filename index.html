@@ -3,189 +3,566 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Innovative Business Ideas using AI & Software</title>
+    <title>The Genesis of Genius - AI Business Ideas</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js"></script>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="home_style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #1e293b; /* slate-800 */
+        }
+        .hero-bg {
+            background: linear-gradient(180deg, #f8fafc 0%, #e0f2fe 100%); /* slate-50 to sky-100 */
+            position: relative;
+            overflow: hidden;
+        }
+        .content-container {
+            position: relative;
+            z-index: 1;
+        }
+        .cta-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .cta-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+        }
+        .card {
+            background-color: white;
+            border: 1px solid #e2e8f0; /* slate-200 */
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #38bdf8; /* sky-400 */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .impact-card {
+            background: linear-gradient(145deg, white, #f0f9ff); /* white to sky-50 */
+        }
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.3), transparent);
+            margin: 4rem auto;
+        }
+        .glyph {
+            font-size: 2.5rem;
+            line-height: 1;
+            color: #0ea5e9; /* sky-500 */
+        }
+        .mobile-menu {
+            display: none;
+        }
+        .mobile-menu.active {
+            display: block;
+        }
+    </style>
 </head>
-<body>
-
+<body class="antialiased">
+    <!-- Navigation Bar -->
     <nav class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md z-50 border-b border-slate-200/80">
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
-                    <a href="#" id="nav-logo" class="text-slate-800 font-bold text-xl">Genesis AI</a>
+                    <a href="home.html" class="text-slate-800 font-bold text-xl">Genesis AI</a>
                 </div>
-                <div class="hidden md:block">
-                    <div id="auth-section-desktop" class="ml-10 flex items-baseline space-x-4">
-                        <!-- Desktop auth links will be injected here -->
-                    </div>
+                <div class="hidden md:flex items-center space-x-6">
+                  
+                    <a href="explore.html" class="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-lg font-medium">Get Started</a>
                 </div>
-                <div class="md:hidden flex items-center">
-                    <button id="mobile-menu-btn" class="p-2 rounded-md text-slate-600 hover:text-slate-800 hover:bg-slate-200 focus:outline-none">
-                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <!-- Mobile menu (hidden by default) -->
-        <div id="mobile-menu" class="mobile-menu md:hidden">
-            <div id="auth-section-mobile" class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <!-- Mobile auth links will be injected here -->
             </div>
         </div>
     </nav>
-    <main class="pt-16">
-    <div id="home-content" class="container mx-auto px-4 py-8 md:py-12">
-        <!-- Home content is loaded from components/home.html for easier management -->
-        <div id="home-placeholder" class="prose text-center text-slate-500">Loading home content…</div>
-    </div>
 
-    <div id="app-content" class="container mx-auto px-4 py-8 md:py-12" style="display: none;">
-        <header class="mb-10 md:mb-16">
-            <div class="flex items-center justify-between">
-                <div class="flex-1">
-                    <h1 class="text-4xl md:text-5xl font-bold text-slate-800 mb-2">Innovative Business Ideas</h1>
-                    <p class="text-lg md:text-xl text-slate-600 md:mx-auto">Leveraging AI & Software to Solve Real-World Problems</p>
-                </div>
-            </div>
-        </header>
-        
-        <!-- Add Idea Button (shown only when logged in) -->
-        <!-- This button has been removed as per the new flow.
-        <div class="flex justify-end mb-10">
-            <button id="add-idea-btn" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium" style="margin-right:1rem;">Add New Idea</button>
+    <!-- Hero Section -->
+    <header class="hero-bg min-h-screen flex items-center justify-center text-center p-6 pt-16">
+        <div class="content-container max-w-4xl mx-auto">
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter text-slate-900 mb-6 animate-fade-in-down">
+                The Next <span class="text-sky-500">Trillion-Dollar Idea</span> Is In Your Head.
+            </h1>
+            <p class="max-w-2xl mx-auto text-lg md:text-xl text-slate-600 mb-10 leading-relaxed animate-fade-in-up">
+                We provide the spark to ignite it. Artificial Intelligence is not just the next wave; it is the new ocean. The fortunes of the next century will be made by those who solve humanity's greatest challenges—and its everyday inconveniences.
+            </p>
+            <a href="explore.html" class="cta-button inline-block bg-sky-500 hover:bg-sky-600 text-white font-bold text-lg py-4 px-10 rounded-lg animate-fade-in-up-delay">
+                Forge Your Legacy
+            </a>
         </div>
-        -->
-        
-        <!-- Add Idea Modal -->
-        <div id="add-idea-modal" class="modal-overlay">
-            <div class="modal-content relative max-w-xl">
-                <button id="add-idea-modal-close" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-                <form id="add-idea-form" class="bg-white p-6 rounded-lg shadow-sm">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-4">Add a New Idea</h2>
-                    <div class="space-y-4">
-                        <input type="text" id="idea-title" name="idea-title" placeholder="Idea Title" class="w-full p-2 border rounded" required>
-                        <textarea id="idea-summary" name="idea-summary" placeholder="Short Summary" class="w-full p-2 border rounded" required></textarea>
-                        <textarea id="idea-details" name="idea-details" placeholder="Full Details (Markdown supported)" class="w-full p-2 border rounded h-32" required></textarea>
-                        <input type="text" id="idea-tags" name="idea-tags" placeholder="Tags (comma-separated, e.g., SaaS, B2B, Health)" class="w-full p-2 border rounded" required>
-                        <input type="text" id="idea-icon" name="idea-icon" placeholder="Icon (Paste SVG code here)" class="w-full p-2 border rounded">
-                        <button type="button" id="add-idea-submit-btn" class="bg-slate-800 hover:bg-slate-700 text-white px-5 py-2 rounded-lg font-medium">Add Idea</button>
+    </header>
+
+    <main class="content-container">
+        <!-- Introduction Section -->
+        <section class="py-16 md:py-20 px-6">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight mb-6">Turn Vision into Reality with <span class="text-sky-500">AI-Powered Tools</span></h2>
+                <p class="max-w-3xl mx-auto text-slate-600 text-lg md:text-xl leading-relaxed mb-12">
+                    The entrepreneurial landscape has changed. With our AI-driven platform, you'll have the tools to deeply research your market, create compelling pitch decks, and develop winning go-to-market strategies. From ideation to execution, we're here to transform your vision into a successful venture.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6 mb-12">
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-bold text-sky-600 mb-2">Research Tools</h3>
+                        <p class="text-slate-600">AI-powered market analysis and competitor research</p>
                     </div>
-                </form>
-            </div>
-        </div>
-
-        <div id="filter-container" class="flex flex-wrap justify-center gap-2 md:gap-3 mb-10">
-            </div>
-
-        <main id="ideas-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            <p id="loading-indicator" class="col-span-full text-center text-slate-500">Loading ideas...</p>
-        </main>
-
-    </div>
-
-    <div id="idea-modal" class="modal-overlay">
-        <div class="modal-content relative">
-                <button id="modal-close-btn" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-            <div id="modal-body">
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-bold text-sky-600 mb-2">Pitch Perfect</h3>
+                        <p class="text-slate-600">Professional pitch decks and presentation tools</p>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-bold text-sky-600 mb-2">Launch Strategy</h3>
+                        <p class="text-slate-600">Customer acquisition and growth frameworks</p>
+                    </div>
                 </div>
-        </div>
-    </div>
-    </main>
-        <!-- Profile Modal -->
-        <div id="profile-modal" class="modal-overlay">
-            <div class="modal-content relative max-w-md" id="profile-modal-content">
-                <button id="profile-modal-close" class="absolute top-4 right-4 text-slate-500 hover:text-slate-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-                <h2 class="text-2xl font-bold text-slate-800 mb-4">User Profile</h2>
-                <form id="profile-form">
-                    <label for="display_name">Display Name:</label>
-                    <input type="text" id="display_name" name="display_name" class="w-full p-2 border rounded mb-2" required>
-                    <label for="bio">Bio:</label>
-                    <textarea id="bio" name="bio" class="w-full p-2 border rounded mb-4"></textarea>
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium">Save Profile</button>
-                </form>
-                <div id="profile-info" style="display:none;"></div>
+                <div class="bg-white border border-slate-200 rounded-xl p-8 max-w-2xl mx-auto shadow-sm">
+                    <p class="text-xl md:text-2xl font-semibold text-sky-600">
+                        "Success in business isn't just about the idea—it's about the execution and the journey."
+                    </p>
+                </div>
             </div>
-        </div>
-        <script type="module" src="user_profile.js"></script>
-        <script src="config.js"></script>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- How It Works Section -->
+        <section class="py-16 md:py-20 px-6 bg-slate-50">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">Your Entrepreneurial Journey</h2>
+                    <p class="mt-4 text-lg text-slate-500">A comprehensive roadmap from ideation to execution.</p>
+                </div>
+                <div class="grid md:grid-cols-4 gap-8">
+                    <!-- Step 1 -->
+                    <div class="card rounded-2xl p-8">
+                        <div class="glyph mb-4">✧</div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-3">Deep Market Research</h3>
+                        <p class="text-slate-600 leading-relaxed">
+                            Leverage AI-powered analytics to uncover market gaps, analyze competitors, and identify your unique value proposition. Make data-driven decisions from day one.
+                        </p>
+                        <ul class="mt-4 text-left text-slate-600 space-y-2">
+                            <li>• Market size analysis</li>
+                            <li>• Competitor mapping</li>
+                            <li>• Customer pain points</li>
+                        </ul>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="card rounded-2xl p-8">
+                        <div class="glyph mb-4">✣</div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-3">Strategic Planning</h3>
+                        <p class="text-slate-600 leading-relaxed">
+                            Build a rock-solid foundation with our AI-guided business planning tools. Turn your vision into an actionable roadmap.
+                        </p>
+                        <ul class="mt-4 text-left text-slate-600 space-y-2">
+                            <li>• Business model canvas</li>
+                            <li>• Financial projections</li>
+                            <li>• Risk assessment</li>
+                        </ul>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="card rounded-2xl p-8">
+                        <div class="glyph mb-4">✦</div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-3">Pitch Perfect</h3>
+                        <p class="text-slate-600 leading-relaxed">
+                            Create compelling pitch decks that captivate investors. Our AI helps craft your story and present data that matters.
+                        </p>
+                        <ul class="mt-4 text-left text-slate-600 space-y-2">
+                            <li>• AI-generated pitch decks</li>
+                            <li>• Investor-ready financials</li>
+                            <li>• Presentation coaching</li>
+                        </ul>
+                    </div>
+                    <!-- Step 4 -->
+                    <div class="card rounded-2xl p-8">
+                        <div class="glyph mb-4">✤</div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-3">Launch Strategy</h3>
+                        <p class="text-slate-600 leading-relaxed">
+                            Navigate the crucial early stages with proven strategies for finding and delighting your first customers.
+                        </p>
+                        <ul class="mt-4 text-left text-slate-600 space-y-2">
+                            <li>• Customer acquisition plan</li>
+                            <li>• MVP development</li>
+                            <li>• Growth roadmap</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Entrepreneur's Toolkit Section -->
+        <section class="py-16 md:py-20 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">Master the Entrepreneurial Challenge</h2>
+                    <p class="mt-4 text-lg text-slate-500">Essential resources and strategies for every stage of your journey.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Obstacles and Solutions -->
+                    <div class="card rounded-2xl p-8">
+                        <h3 class="text-2xl font-bold text-sky-600 mb-6">Common Obstacles & Solutions</h3>
+                        <div class="space-y-4">
+                            <div class="border-b border-slate-200 pb-4">
+                                <h4 class="font-bold text-slate-800">Finding Product-Market Fit</h4>
+                                <p class="text-slate-600">AI-powered tools to validate your assumptions and iterate based on real market feedback.</p>
+                            </div>
+                            <div class="border-b border-slate-200 pb-4">
+                                <h4 class="font-bold text-slate-800">Securing Funding</h4>
+                                <p class="text-slate-600">Strategic guidance on bootstrapping, fundraising, and alternative funding sources.</p>
+                            </div>
+                            <div class="border-b border-slate-200 pb-4">
+                                <h4 class="font-bold text-slate-800">Building the Right Team</h4>
+                                <p class="text-slate-600">Resources for hiring, team structure, and creating a strong company culture.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- First Customer Strategy -->
+                    <div class="card rounded-2xl p-8">
+                        <h3 class="text-2xl font-bold text-sky-600 mb-6">First Customer Playbook</h3>
+                        <div class="space-y-4">
+                            <div class="border-b border-slate-200 pb-4">
+                                <h4 class="font-bold text-slate-800">Identify Early Adopters</h4>
+                                <p class="text-slate-600">Tools and techniques to find and engage your ideal first customers.</p>
+                            </div>
+                            <div class="border-b border-slate-200 pb-4">
+                                <h4 class="font-bold text-slate-800">Value Proposition Testing</h4>
+                                <p class="text-slate-600">Frameworks for testing and refining your offering with real users.</p>
+                            </div>
+                            <div class="border-b border-slate-200 pb-4">
+                                <h4 class="font-bold text-slate-800">Customer Success Blueprint</h4>
+                                <p class="text-slate-600">Strategies to ensure your first customers become your biggest advocates.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <div class="section-divider"></div>
+
+        <!-- Impact Spectrum Section -->
+        <section class="py-16 md:py-20 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">From Micro-Innovations to Global Revolutions</h2>
+                    <p class="mt-4 text-lg text-slate-500">Your impact can be felt anywhere.</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Daily Life -->
+                    <div class="impact-card card rounded-2xl p-8 flex flex-col">
+                        <h3 class="text-2xl font-bold text-sky-600 mb-3">Solve the Small Problems</h3>
+                        <p class="text-slate-600 leading-relaxed flex-grow">
+                            Create AI tools that save people 10 minutes a day, eliminate a common frustration, or bring a moment of joy. Small changes, massive scale.
+                        </p>
+                    </div>
+                    <!-- Industry Disruption -->
+                    <div class="impact-card card rounded-2xl p-8 flex flex-col">
+                        <h3 class="text-2xl font-bold text-sky-600 mb-3">Reshape an Industry</h3>
+                        <p class="text-slate-600 leading-relaxed flex-grow">
+                            Build the next-gen platform that becomes the new standard for logistics, manufacturing, or creative work. Become an essential part of the new economy.
+                        </p>
+                    </div>
+                    <!-- Grand Challenges -->
+                    <div class="impact-card card rounded-2xl p-8 flex flex-col">
+                        <h3 class="text-2xl font-bold text-sky-600 mb-3">Tackle a World Problem</h3>
+                        <p class="text-slate-600 leading-relaxed flex-grow">
+                            Deploy AI to address challenges in climate, personalized medicine, or global access to knowledge. Build a business that the history books will remember.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- World Problems Section -->
+        <section id="world-problems" class="py-16 md:py-20 px-6 bg-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">The World's Pressing Problems </br><span class="text-sky-500"> Innovate & Lead the change</span></h2>
+                    <p class="mt-4 text-lg text-slate-500 max-w-3xl mx-auto">These are measurable, urgent challenges where technology and AI can create meaningful solutions.</p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Extreme Poverty</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">~700M people</div>
+                        <p class="text-slate-600 text-sm">Live on less than $2.15/day — World Bank</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Global Inflation</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">5.9% (2024)</div>
+                        <p class="text-slate-600 text-sm">IMF projection</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Global Growth</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">~3.2% (2024)</div>
+                        <p class="text-slate-600 text-sm">IMF forecast</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Income Inequality</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">Top 10% → 52% income</div>
+                        <p class="text-slate-600 text-sm">World Inequality Report</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Youth Unemployment</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">13.8%</div>
+                        <p class="text-slate-600 text-sm">ILO — nearly 3x adult rate</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Digital Divide</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">~2.6B people offline</div>
+                        <p class="text-slate-600 text-sm">ITU</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Global Temperature Rise</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">~1.2°C</div>
+                        <p class="text-slate-600 text-sm">WMO — warming since pre-industrial</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Atmospheric CO₂</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">~424 ppm</div>
+                        <p class="text-slate-600 text-sm">NOAA — highest in 800k years</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Species at Risk</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">>1M species</div>
+                        <p class="text-slate-600 text-sm">IPBES — threatened with extinction</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Deforestation</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">~10M ha/yr</div>
+                        <p class="text-slate-600 text-sm">FAO</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Plastic Pollution</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">~400M tonnes/yr</div>
+                        <p class="text-slate-600 text-sm">UNEP</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Soil Degradation</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">>33% of soils</div>
+                        <p class="text-slate-600 text-sm">FAO — moderate to high degradation</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Forcibly Displaced</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">~114M people</div>
+                        <p class="text-slate-600 text-sm">UNHCR</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Global Peace</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">Deteriorating</div>
+                        <p class="text-slate-600 text-sm">Global Peace Index — 9th consecutive year down</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Hunger</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">691–783M people</div>
+                        <p class="text-slate-600 text-sm">FAO — facing hunger (2022)</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Access to Clean Water</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">~2.2B people</div>
+                        <p class="text-slate-600 text-sm">Lack safely managed drinking water — WHO/UNICEF</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Access to Sanitation</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">~3.6B people</div>
+                        <p class="text-slate-600 text-sm">Lack safely managed sanitation — WHO/UNICEF</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Child Malnutrition</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">149M stunted; 45M wasted</div>
+                        <p class="text-slate-600 text-sm">UNICEF/WHO/World Bank (2022)</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Maternal Mortality</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">~287K deaths</div>
+                        <p class="text-slate-600 text-sm">WHO (2020)</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Mental Health</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">~1B people</div>
+                        <p class="text-slate-600 text-sm">Live with a mental disorder — WHO</p>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Antimicrobial Resistance</h3>
+                        <div class="text-xl font-bold text-sky-600 mb-1">~1.27M deaths (2019)</div>
+                        <p class="text-slate-600 text-sm">The Lancet</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Visualizations: Government & Household Spending -->
+        <section class="py-12 px-6 bg-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Public & Household Spending — Quick Visuals</h2>
+                    <p class="mt-2 text-sm text-slate-500">Snapshot charts showing government spending by sector and how U.S. households allocate income.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="p-6 bg-white border border-slate-100 rounded-lg shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4">Government Spending by Sector (2023)</h3>
+                        <div id="gov-spend-table" class="text-sm"></div>
+                        <div class="mt-3 text-xs text-slate-500">Source: <a href="/data/spending_2023.json">Local data file (sourced from OMB Historical Tables)</a></div>
+                    </div>
+
+                    <div class="p-6 bg-white border border-slate-100 rounded-lg shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-4">U.S. Household Income Allocation (2023)</h3>
+                        <div id="household-spend-table" class="text-sm"></div>
+                        <div class="mt-3 text-xs text-slate-500">Source: <a href="/data/spending_2023.json">Local data file (sourced from BLS CEX)</a></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Inline JSON fallback to ensure data is available even when static fetch fails -->
+        <script id="spending-data" type="application/json">
+{
+  "gov_spending": {
+    "year": 2023,
+    "note": "Percent shares are presented for quick visualization. Please verify exact dollar amounts or categories against the OMB Historical Tables (link below).",
+    "source": "https://www.whitehouse.gov/omb/historical-tables/",
+    "items": [
+      { "label": "Social Security", "share": 24 },
+      { "label": "Healthcare (Medicare/Medicaid)", "share": 25 },
+      { "label": "Defense", "share": 15 },
+      { "label": "Net Interest", "share": 8 },
+      { "label": "Education", "share": 6 },
+      { "label": "Other", "share": 22 }
+    ]
+  },
+  "household_spending": {
+    "year": 2023,
+    "note": "Percent of average annual expenditures allocated by category. Please verify against BLS Consumer Expenditure Survey (CEX) calendar-year tables.",
+    "source": "https://www.bls.gov/cex/",
+    "items": [
+      { "label": "Housing", "share": 33 },
+      { "label": "Transportation", "share": 16 },
+      { "label": "Food", "share": 13 },
+      { "label": "Healthcare", "share": 8 },
+      { "label": "Entertainment", "share": 5 },
+      { "label": "Savings & Investments", "share": 10 },
+      { "label": "Other", "share": 15 }
+    ]
+  }
+}
+        </script>
+
+        <!-- Data render script: prefer inline JSON then fall back to fetching the local JSON file -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                (function () {
+                    function showFetchError() {
+                        var msg = '<div class="text-sm text-rose-600">Data not available. You can view the raw JSON <a class="underline" href="/data/spending_2023.json">here</a> if the server is running.</div>';
+                        document.getElementById('gov-spend-table').innerHTML = msg;
+                        document.getElementById('household-spend-table').innerHTML = msg;
+                    }
+
+                    function renderTables(data) {
+                        try {
+                            var gov = data.gov_spending || { items: [] };
+                            var govHtml = '<table class="w-full table-auto text-left"><thead><tr><th class="pb-2">Category</th><th class="pb-2">Share (%)</th></tr></thead><tbody>';
+                            gov.items.forEach(function (it) {
+                                govHtml += '<tr><td class="py-2 border-t border-slate-100">' + it.label + '</td><td class="py-2 border-t border-slate-100 font-semibold text-sky-600">' + it.share + '%</td></tr>';
+                            });
+                            govHtml += '</tbody></table>';
+                            document.getElementById('gov-spend-table').innerHTML = govHtml;
+
+                            var hh = data.household_spending || { items: [] };
+                            var hhHtml = '<table class="w-full table-auto text-left"><thead><tr><th class="pb-2">Category</th><th class="pb-2">Share (%)</th></tr></thead><tbody>';
+                            hh.items.forEach(function (it) {
+                                hhHtml += '<tr><td class="py-2 border-t border-slate-100">' + it.label + '</td><td class="py-2 border-t border-slate-100 font-semibold text-sky-600">' + it.share + '%</td></tr>';
+                            });
+                            hhHtml += '</tbody></table>';
+                            document.getElementById('household-spend-table').innerHTML = hhHtml;
+                        } catch (e) {
+                            console.error('Render error', e);
+                            showFetchError();
+                        }
+                    }
+
+                    // Prefer inline JSON if present
+                    var inline = document.getElementById('spending-data');
+                    if (inline) {
+                        try {
+                            var parsed = JSON.parse(inline.textContent || inline.innerText);
+                            renderTables(parsed);
+                            return;
+                        } catch (e) {
+                            console.error('Invalid inline JSON', e);
+                        }
+                    }
+
+                    // Fall back to fetching the local JSON file
+                    var triedPaths = ['/data/spending_2023.json', 'data/spending_2023.json'];
+                    (function tryNext(i) {
+                        if (i >= triedPaths.length) { showFetchError(); return; }
+                        var p = triedPaths[i];
+                        fetch(p, { cache: 'no-cache' })
+                            .then(function (res) {
+                                if (!res.ok) { throw new Error('not ok'); }
+                                return res.json();
+                            })
+                            .then(function (json) { renderTables(json); })
+                            .catch(function () { tryNext(i + 1); });
+                    })(0);
+                })();
+            });
+        </script>
+
+        <!-- Final Call to Action Section -->
+        <section class="py-16 md:py-20 px-6 text-center bg-slate-50">
+            <div class="max-w-3xl mx-auto">
+                <h2 class="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter mb-6">
+                    An Idea is a Seed. <span class="text-sky-500">Action is the Water.</span>
+                </h2>
+                <p class="text-lg md:text-xl text-slate-600 mb-10 leading-relaxed">
+                    The gap between where you are and where you could be is a single, powerful idea brought to life. Don't wait for the future to happen to you. Take the definitive first step.
+                </p>
+                <a href="explore.html" class="cta-button inline-block bg-sky-500 hover:bg-sky-600 text-white font-bold text-lg py-4 px-10 rounded-lg">
+                    Start Building Now
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-8 border-t border-slate-200">
+        <p class="text-gray-500">&copy; 2025 Genesis AI. All Rights Reserved.</p>
+    </footer>
+
     <script>
-        // Load the home partial and inject into #home-content, executing any scripts inside the partial
-        (async function(){
-            try{
-
-                const resp = await fetch('components/home.html');
-                if(!resp.ok) throw new Error('Failed to load home partial');
-                const html = await resp.text();
-                const container = document.getElementById('home-content');
-
-                // Parse the HTML into a temporary container
-                const temp = document.createElement('div');
-                temp.innerHTML = html;
-
-                // Collect executable scripts (external or JS/module) and remove them from temp so they are not duplicated
-                const scriptNodes = Array.from(temp.querySelectorAll('script'));
-                const execScripts = [];
-                scriptNodes.forEach(function(s) {
-                    var t = s.type && s.type.toLowerCase();
-                    var isExecutable = s.src || t === 'module' || !t || t === 'text/javascript';
-                    if (isExecutable) {
-                        execScripts.push({ src: s.src, type: s.type, text: s.textContent });
-                        s.parentNode.removeChild(s);
-                    }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click events for navigation buttons
+            const forgeBtn = document.querySelector('.cta-button');
+            const startBuildingBtn = document.getElementById('start-building-btn');
+            
+            if (startBuildingBtn) {
+                startBuildingBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = 'explore.html';
                 });
-
-                // Move remaining nodes into the real container (this keeps non-executable scripts like application/json)
-                while (temp.firstChild) {
-                    container.appendChild(temp.firstChild);
-                }
-
-                // Remove the loading placeholder if present
-                const ph = document.getElementById('home-placeholder');
-                if (ph && ph.parentNode) ph.parentNode.removeChild(ph);
-
-                // Now append and execute the collected executable scripts in order
-                execScripts.forEach(function(s) {
-                    var newS = document.createElement('script');
-                    if (s.type) newS.type = s.type;
-                    if (s.src) {
-                        newS.src = s.src;
-                        newS.async = false;
-                    } else {
-                        newS.textContent = s.text || '';
-                    }
-                    // Append to container so scripts run in page context
-                    container.appendChild(newS);
-                });
-
-            }catch(e){
-                console.error(e);
-                const ph = document.getElementById('home-placeholder');
-                if(ph) ph.textContent = 'Unable to load home content.';
             }
-        })();
+        });
     </script>
-    <script type="module" src="app.js"></script>
-    <script type="module" src="api.js"></script>
-    <script type="module" src="auth.js"></script>
-    <script type="module" src="ui.js"></script>
 </body>
 </html>

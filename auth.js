@@ -288,6 +288,6 @@ function openLogoutModal() {
 }
 
 // logout helper exposed for possible use
-async function handleLogout() {
+export async function handleLogout() {
     await db.auth.signOut();
 }
