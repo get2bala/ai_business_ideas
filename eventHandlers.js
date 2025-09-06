@@ -150,13 +150,8 @@ function setupSidebarEventListeners() {
                 return;
             }
             
-            // Redirect to the idea generation page or show modal
-            const addIdeaModal = document.getElementById('add-idea-modal');
-            if (addIdeaModal) {
-                addIdeaModal.classList.add('active');
-            } else {
-                window.location.href = '/generate.html';
-            }
+            // Dispatch the generateAutoIdea event to show the modal with both options
+            document.dispatchEvent(new CustomEvent('generateAutoIdea'));
             
             // On mobile, close the sidebar after selection
             if (window.innerWidth <= 768) {

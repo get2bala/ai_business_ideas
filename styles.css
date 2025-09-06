@@ -54,6 +54,33 @@ body {
 .modal-overlay.active .modal-content {
     transform: scale(1);
 }
+
+/* Tab Navigation Styles */
+.tab-btn {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+    font-weight: 500;
+}
+
+.tab-btn:hover:not(.active) {
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+/* Textarea styling */
+textarea {
+    resize: vertical;
+    min-height: 100px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+textarea:focus, input:focus, button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
 /* Styles for rendered markdown content in modal */
 .modal-markdown h3 {
     font-size: 1.125rem; /* text-lg */

@@ -863,43 +863,118 @@ document.addEventListener('generateAutoIdea', async (e) => {
         body.innerHTML = `
             <div class="space-y-6">
                 <h2 class="text-2xl font-bold text-slate-800 mb-4 text-center">Create New Idea</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- AI Generation Option -->
-                    <div class="p-6 border rounded-lg hover:border-blue-500 cursor-pointer transition-all" id="ai-generation-option">
-                        <h3 class="text-lg font-semibold text-slate-800 mb-2">AI Generated</h3>
-                        <p class="text-slate-600 mb-4">Let AI help you generate a comprehensive business idea based on your input.</p>
-                        <input id="auto-idea-prompt" type="text" placeholder="Specify a problem or industry?" class="w-full p-2 border rounded mb-4" />
-                        <button id="auto-idea-generate-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Generate with AI</button>
-                    </div>
-                    
-                    <!-- Manual Entry Option -->
-                    <div class="p-6 border rounded-lg hover:border-blue-500 cursor-pointer transition-all" id="manual-entry-option">
-                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Manual Entry</h3>
-                        <p class="text-slate-600 mb-4">Create your own business idea with our structured template.</p>
-                        <button id="manual-entry-btn" class="w-full bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded">Create Manually</button>
+                
+                <!-- Tab Navigation -->
+                <div class="flex border-b border-slate-200 mb-6">
+                    <button id="ai-tab-btn" class="tab-btn active px-4 py-2 border-b-2 border-blue-500 font-medium text-blue-600">AI Generated</button>
+                    <button id="manual-tab-btn" class="tab-btn px-4 py-2 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-700">Manual Entry</button>
+                </div>
+                
+                <!-- AI Generation Tab (visible by default) -->
+                <div id="ai-generation-tab" class="tab-content">
+                    <div class="bg-gradient-to-br from-sky-50 to-indigo-50 p-6 rounded-lg border border-sky-100 shadow-sm">
+                        <div class="flex items-center mb-4">
+                            <div class="text-2xl mr-3">✨</div>
+                            <h3 class="text-lg font-semibold text-slate-800">AI Generated Business Idea</h3>
+                        </div>
+                        <p class="text-slate-600 mb-6">Let AI help you generate a comprehensive business idea. Enter a brief description of the problem, industry, or technology you're interested in.</p>
+                        
+                        <label for="auto-idea-prompt" class="block text-sm font-medium text-slate-700 mb-1">Describe your idea focus:</label>
+                        <textarea id="auto-idea-prompt" class="w-full p-3 border border-slate-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 mb-4" 
+                            placeholder="Examples: 'An AI tool for small businesses', 'Climate change solutions using blockchain', 'Healthcare app for elderly patients'"></textarea>
+                        
+                        <div class="flex justify-end mt-4">
+                            <button id="auto-idea-cancel-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-4 py-2 rounded mr-2">Cancel</button>
+                            <button id="auto-idea-generate-btn" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-2 rounded font-medium shadow-sm">
+                                <span class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                                    </svg>
+                                    Generate Idea
+                                </span>
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div class="flex justify-end mt-4">
-                    <button id="auto-idea-cancel-btn" class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded">Close</button>
+                
+                <!-- Manual Entry Tab (initially hidden) -->
+                <div id="manual-entry-tab" class="tab-content hidden">
+                    <div class="bg-gradient-to-br from-slate-50 to-gray-50 p-6 rounded-lg border border-slate-200 shadow-sm">
+                        <div class="flex items-center mb-4">
+                            <div class="text-2xl mr-3">📝</div>
+                            <h3 class="text-lg font-semibold text-slate-800">Create Your Own Idea</h3>
+                        </div>
+                        <p class="text-slate-600 mb-6">Use our structured template to define and document your business idea in detail.</p>
+                        
+                        <div class="flex justify-end mt-4">
+                            <button id="auto-idea-cancel-btn-manual" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-4 py-2 rounded mr-2">Cancel</button>
+                            <button id="manual-entry-btn" class="bg-gradient-to-r from-slate-700 to-slate-900 hover:from-slate-800 hover:to-slate-950 text-white px-6 py-2 rounded font-medium shadow-sm">
+                                <span class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                    </svg>
+                                    Create Manually
+                                </span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
         autoModal.classList.add('active');
+        
+        // Get tab elements
+        const aiTabBtn = document.getElementById('ai-tab-btn');
+        const manualTabBtn = document.getElementById('manual-tab-btn');
+        const aiTab = document.getElementById('ai-generation-tab');
+        const manualTab = document.getElementById('manual-entry-tab');
+        
+        // Tab switching functionality
+        if (aiTabBtn && manualTabBtn) {
+            aiTabBtn.addEventListener('click', () => {
+                // Update tab buttons
+                aiTabBtn.classList.add('active', 'border-blue-500', 'text-blue-600');
+                aiTabBtn.classList.remove('border-transparent', 'text-slate-500');
+                manualTabBtn.classList.remove('active', 'border-blue-500', 'text-blue-600');
+                manualTabBtn.classList.add('border-transparent', 'text-slate-500');
+                
+                // Show/hide content
+                aiTab.classList.remove('hidden');
+                manualTab.classList.add('hidden');
+            });
+            
+            manualTabBtn.addEventListener('click', () => {
+                // Update tab buttons
+                manualTabBtn.classList.add('active', 'border-blue-500', 'text-blue-600');
+                manualTabBtn.classList.remove('border-transparent', 'text-slate-500');
+                aiTabBtn.classList.remove('active', 'border-blue-500', 'text-blue-600');
+                aiTabBtn.classList.add('border-transparent', 'text-slate-500');
+                
+                // Show/hide content
+                manualTab.classList.remove('hidden');
+                aiTab.classList.add('hidden');
+            });
+        }
+        
+        // Get other UI elements
         const genBtn = document.getElementById('auto-idea-generate-btn');
         const manualBtn = document.getElementById('manual-entry-btn');
         const cancelBtn = document.getElementById('auto-idea-cancel-btn');
-        const inputEl = document.getElementById('auto-idea-prompt');
+        const cancelBtnManual = document.getElementById('auto-idea-cancel-btn-manual');
+        const promptTextarea = document.getElementById('auto-idea-prompt');
         
+        // Cancel buttons
         if (cancelBtn) cancelBtn.addEventListener('click', () => autoModal.classList.remove('active'));
+        if (cancelBtnManual) cancelBtnManual.addEventListener('click', () => autoModal.classList.remove('active'));
         
         // AI Generation option
-        if (genBtn && inputEl) {
-            genBtn.addEventListener('click', () => generateAndRender(inputEl.value));
-            // Also support Enter key in input
-            inputEl.addEventListener('keydown', (ev) => { 
-                if (ev.key === 'Enter') { 
+        if (genBtn && promptTextarea) {
+            genBtn.addEventListener('click', () => generateAndRender(promptTextarea.value));
+            // Also support Ctrl+Enter in textarea
+            promptTextarea.addEventListener('keydown', (ev) => { 
+                if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) { 
                     ev.preventDefault(); 
-                    generateAndRender(inputEl.value); 
+                    generateAndRender(promptTextarea.value); 
                 } 
             });
         }

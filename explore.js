@@ -401,36 +401,8 @@ if (sidebarToggleBtn) {
                 return;
             }
             
-            try {
-                // Show loading indicator
-                const loadingToast = showToast('Generating idea...', 'info');
-                
-                // Import the auto idea generator
-                const { generateIdea } = await import('./auto_idea_generator.js');
-                const newIdea = await generateIdea();
-                
-                // Show the "Add Idea" form with pre-filled fields
-                const addIdeaModal = document.getElementById('add-idea-modal');
-                const formElements = document.getElementById('add-idea-form').elements;
-                
-                // Pre-fill form with generated idea
-                formElements['idea-title'].value = newIdea.title;
-                formElements['idea-summary'].value = newIdea.summary;
-                formElements['idea-details'].value = newIdea.details;
-                formElements['idea-tags'].value = newIdea.tags.join(', ');
-                formElements['idea-icon'].value = newIdea.icon || '';
-                
-                // Show the modal
-                addIdeaModal.classList.add('active');
-                
-                // Hide loading indicator
-                if (loadingToast && loadingToast.parentNode) {
-                    loadingToast.parentNode.removeChild(loadingToast);
-                }
-            } catch (error) {
-                console.error('Error generating idea:', error);
-                showToast('Failed to generate idea. Please try again.', 'error');
-            }
+            // Dispatch the generateAutoIdea event to show the modal with both options
+            document.dispatchEvent(new CustomEvent('generateAutoIdea'));
         });
     }
     
