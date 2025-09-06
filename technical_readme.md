@@ -10,6 +10,11 @@ Project layout (important files)
 - `db.js` — exports `db` (Supabase client) or a test stub when unavailable.
 - `auth.js` — manages authentication UI and `initAuth(onAuthStateChange)` / `getCurrentUser()`.
 - `api.js` — CRUD API wrappers for ideas and favorites using `db`.
+- `upvote_api.js` — API wrappers for idea upvoting functionality.
+- `upvote_ui.js` — UI components for displaying and handling upvote interactions.
+- `comments_api.js` — API wrappers for idea comments.
+- `comments_ui.js` — UI components for comments display and interactions.
+- `share_api.js` — Utilities for sharing idea content via Web Share API or clipboard.
 - `ui.js` — DOM rendering, modal logic, markdown rendering (prefers `markdown-it`, includes a small fallback).
 - `app.js` — bootstraps the app: initializes auth, loads ideas, wires UI handlers.
 - `auto_idea_api.js` — client-side wrapper that calls the Edge Function (adds Authorization header, handles 401, falls back to local generator).
@@ -55,6 +60,8 @@ Contract: client ⇄ generate-edge-function
 Data shapes
 - idea (client / DB): { id?, title, summary, details (markdown), tags: string[], icon?, user_id? }
 - session: { access_token, user }
+- upvote: { id, idea_id, user_id, created_at }
+- comment: { id, idea_id, user_id, text, created_at }
 
 Common failure modes & debugging checklist
 

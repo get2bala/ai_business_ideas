@@ -1,6 +1,10 @@
 // ui.js
 import * as api from './api.js';
 import { fetchAutoIdea } from './auto_idea_api.js';
+import { initializeUpvoteButtons, initializeModalUpvoteButton } from './upvote_ui.js';
+import { fetchUpvotesCount, hasUserUpvoted, toggleUpvote } from './upvote_api.js';
+import { fetchCommentCount } from './comments_api.js';
+import { copyShareUrl, shareIdea } from './share_api.js';
 
 // Small UI indicator for automatic idea generation status
 function createAutoGenStatusIndicator() {
@@ -107,6 +111,15 @@ export function renderIdeas(ideas, activeTags, user, onIdeaDeleted) {
         
         // Add event listeners
         card.addEventListener('click', () => openModal(idea));
+        
+        // Make upvote button, comment button, and share button stop propagation
+        const actionButtons = card.querySelectorAll('.social-action-btn');
+        actionButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card click (modal opening)
+            });
+        });
+        
         // Favorite button handler (if present)
         const favBtn = card.querySelector('.fav-btn');
         if (favBtn) {
@@ -163,6 +176,264 @@ export function renderIdeas(ideas, activeTags, user, onIdeaDeleted) {
             });
         }
     });
+    
+    // Initialize social action buttons
+    initializeSocialActionButtons(filteredIdeas, user);
+}
+
+// Initialize social action buttons on all idea cards
+async function initializeSocialActionButtons(ideas, user) {
+    // Process each card
+    const cards = document.querySelectorAll('.card');
+    
+    for (const card of cards) {
+        const ideaId = card.dataset.ideaId;
+        if (!ideaId) continue;
+        
+        // Find the idea object from the array
+        const idea = ideas.find(i => String(i.id) === String(ideaId));
+        if (!idea) continue;
+        
+        // Initialize upvote count
+        try {
+            const upvoteCount = await fetchUpvotesCount(ideaId);
+            const upvoteCountEl = card.querySelector('.upvote-count');
+            if (upvoteCountEl) upvoteCountEl.textContent = upvoteCount;
+            
+            // Set active state if user has upvoted
+            if (user) {
+                const hasUpvoted = await hasUserUpvoted(user.id, ideaId);
+                const upvoteBtn = card.querySelector('.upvote-btn');
+                if (upvoteBtn && hasUpvoted) {
+                    upvoteBtn.classList.remove('text-slate-500');
+                    upvoteBtn.classList.add('text-blue-500');
+                    upvoteBtn.setAttribute('data-upvoted', 'true');
+                }
+            }
+        } catch (error) {
+            console.error('Error initializing upvote count:', error);
+        }
+        
+        // Initialize comment count
+        try {
+            const commentCount = await fetchCommentCount(ideaId);
+            const commentCountEl = card.querySelector('.comment-count');
+            // Only update comment count if user is logged in
+            if (commentCountEl && user) {
+                commentCountEl.textContent = commentCount;
+            }
+        } catch (error) {
+            console.error('Error initializing comment count:', error);
+        }
+        
+        // Add click events
+        
+        // Upvote button click
+        const upvoteBtn = card.querySelector('.upvote-btn');
+        if (upvoteBtn) {
+            upvoteBtn.addEventListener('click', async (e) => {
+                e.stopPropagation(); // Prevent card click (modal opening)
+                
+                const userId = document.body && document.body.dataset ? document.body.dataset.currentUser : null;
+                if (!userId) {
+                    // Show login prompt for non-logged in users
+                    alert('Please log in to upvote ideas');
+                    return;
+                }
+                
+                const ideaId = upvoteBtn.getAttribute('data-idea-id');
+                const isUpvoted = upvoteBtn.getAttribute('data-upvoted') === 'true';
+                const countEl = upvoteBtn.querySelector('.upvote-count');
+                const currentCount = parseInt(countEl.textContent, 10) || 0;
+                
+                // Optimistic UI update
+                upvoteBtn.setAttribute('data-upvoted', (!isUpvoted).toString());
+                if (!isUpvoted) {
+                    upvoteBtn.classList.remove('text-slate-500');
+                    upvoteBtn.classList.add('text-blue-500');
+                    countEl.textContent = currentCount + 1;
+                } else {
+                    upvoteBtn.classList.remove('text-blue-500');
+                    upvoteBtn.classList.add('text-slate-500');
+                    countEl.textContent = Math.max(0, currentCount - 1);
+                }
+                
+                // Send to server
+                try {
+                    const result = await toggleUpvote(userId, ideaId);
+                    
+                    // If operation failed, revert UI
+                    if (!result.success) {
+                        upvoteBtn.setAttribute('data-upvoted', isUpvoted.toString());
+                        if (isUpvoted) {
+                            upvoteBtn.classList.remove('text-slate-500');
+                            upvoteBtn.classList.add('text-blue-500');
+                        } else {
+                            upvoteBtn.classList.remove('text-blue-500');
+                            upvoteBtn.classList.add('text-slate-500');
+                        }
+                        countEl.textContent = currentCount;
+                    }
+                } catch (error) {
+                    console.error('Error toggling upvote:', error);
+                    // Revert UI
+                    upvoteBtn.setAttribute('data-upvoted', isUpvoted.toString());
+                    if (isUpvoted) {
+                        upvoteBtn.classList.remove('text-slate-500');
+                        upvoteBtn.classList.add('text-blue-500');
+                    } else {
+                        upvoteBtn.classList.remove('text-blue-500');
+                        upvoteBtn.classList.add('text-slate-500');
+                    }
+                    countEl.textContent = currentCount;
+                }
+            });
+        }
+        
+        // Comment button click - open modal and scroll to comments
+        const commentBtn = card.querySelector('.comment-btn');
+        if (commentBtn) {
+            commentBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card click (modal opening)
+                
+                // Open the modal
+                openModal(idea);
+                
+                // Scroll to comments section after a short delay to allow modal to open
+                setTimeout(() => {
+                    const commentsSection = document.getElementById('comments-section');
+                    if (commentsSection) {
+                        commentsSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }, 300);
+            });
+        }
+        
+        // Share button click
+        const shareBtn = card.querySelector('.share-btn');
+        if (shareBtn) {
+            shareBtn.addEventListener('click', async (e) => {
+                e.stopPropagation(); // Prevent card click (modal opening)
+                
+                const ideaId = shareBtn.getAttribute('data-idea-id');
+                
+                // Try to use navigator.share if available (mobile devices)
+                if (navigator.share) {
+                    try {
+                        await shareIdea(idea);
+                        showToast('Shared successfully!');
+                    } catch (error) {
+                        console.error('Error sharing idea:', error);
+                        fallbackToClipboardShare(ideaId);
+                    }
+                } else {
+                    // Fallback to clipboard copy
+                    fallbackToClipboardShare(ideaId);
+                }
+            });
+        }
+    }
+}
+
+// Fallback to clipboard copying for share
+async function fallbackToClipboardShare(ideaId) {
+    // Create a popup dialog with the link
+    const shareUrl = await copyShareUrl(ideaId);
+    
+    // Create or get a share dialog
+    let shareDialog = document.getElementById('share-dialog');
+    if (!shareDialog) {
+        shareDialog = document.createElement('div');
+        shareDialog.id = 'share-dialog';
+        shareDialog.className = 'fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50';
+        document.body.appendChild(shareDialog);
+    }
+    
+    // Set the content of the dialog
+    shareDialog.innerHTML = `
+        <div class="bg-white p-4 rounded-lg shadow-lg max-w-md w-full">
+            <h3 class="text-lg font-semibold mb-2">Share this idea</h3>
+            <div class="flex mb-3">
+                <input type="text" value="${shareUrl.url}" class="flex-grow p-2 border rounded-l" id="share-url-input" readonly>
+                <button class="bg-sky-500 text-white px-4 py-2 rounded-r" id="copy-share-url-btn">Copy</button>
+            </div>
+            <div class="flex justify-end">
+                <button class="bg-slate-200 hover:bg-slate-300 px-4 py-2 rounded" id="close-share-dialog-btn">Close</button>
+            </div>
+        </div>
+    `;
+    
+    // Add event listeners
+    document.getElementById('close-share-dialog-btn').addEventListener('click', () => {
+        shareDialog.remove();
+    });
+    
+    document.getElementById('copy-share-url-btn').addEventListener('click', async () => {
+        const input = document.getElementById('share-url-input');
+        input.select();
+        
+        try {
+            await navigator.clipboard.writeText(input.value);
+            showToast('Link copied to clipboard!');
+        } catch (error) {
+            // Fallback to document.execCommand
+            try {
+                document.execCommand('copy');
+                showToast('Link copied to clipboard!');
+            } catch (err) {
+                showToast('Failed to copy link. Please select and copy manually.', 'error');
+            }
+        }
+    });
+    
+    // Close when clicking outside
+    shareDialog.addEventListener('click', (e) => {
+        if (e.target === shareDialog) {
+            shareDialog.remove();
+        }
+    });
+    
+    // Allow closing with escape key
+    document.addEventListener('keydown', function closeShareDialogOnEsc(e) {
+        if (e.key === 'Escape') {
+            shareDialog.remove();
+            document.removeEventListener('keydown', closeShareDialogOnEsc);
+        }
+    });
+}
+
+// Show a toast notification
+function showToast(message, type = 'success') {
+    // Check if there's already a toast container
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toast-container';
+        toastContainer.className = 'fixed bottom-4 right-4 z-50';
+        document.body.appendChild(toastContainer);
+    }
+    
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `p-3 rounded shadow-md mb-2 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`;
+    toast.textContent = message;
+    
+    // Add to container
+    toastContainer.appendChild(toast);
+    
+    // Remove after delay
+    setTimeout(() => {
+        toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+            // Remove container if empty
+            if (toastContainer.children.length === 0) {
+                document.body.removeChild(toastContainer);
+            }
+        }, 300);
+    }, 3000);
 }
 
 function createCardHTML(idea, user, isFav = false) {
@@ -190,13 +461,42 @@ function createCardHTML(idea, user, isFav = false) {
                     ${favButton}
                 </div>
             </div>
+            
+            <!-- Reddit-style social action buttons -->
+            <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between">
+                <!-- Upvote button -->
+                <button class="social-action-btn upvote-btn flex items-center text-slate-500 hover:text-blue-500 transition-colors" data-idea-id="${idea.id}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 15l7-7 7 7"></path>
+                    </svg>
+                    <span class="upvote-count text-sm">0</span>
+                </button>
+                
+                <!-- Comments button - always visible but count only shown when logged in -->
+                <button class="social-action-btn comment-btn flex items-center text-slate-500 hover:text-green-500 transition-colors" data-idea-id="${idea.id}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                    </svg>
+                    <span class="comment-count text-sm">${user ? '0' : 'Comments'}</span>
+                </button>
+                
+                <!-- Share button -->
+                <button class="social-action-btn share-btn flex items-center text-slate-500 hover:text-purple-500 transition-colors" data-idea-id="${idea.id}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                        <polyline points="16 6 12 2 8 6"></polyline>
+                        <line x1="12" y1="2" x2="12" y2="15"></line>
+                    </svg>
+                    <span class="text-sm">Share</span>
+                </button>
+            </div>
         </div>
     `;
 }
 
 // ... (You can move populateFilters, openModal, closeModal, etc. here)
 // Modal functions and filter helpers
-function openModal(idea) {
+export function openModal(idea) {
     const modal = document.getElementById('idea-modal');
     const modalBody = document.getElementById('modal-body');
     if (!modal || !modalBody) return;
@@ -216,11 +516,101 @@ const renderedDetails = md ? md.render(idea.details || '') : markdownParser(idea
             <div class="flex flex-wrap gap-2 mt-4">
                 ${idea.tags.map(tag => `<span class="text-xs font-medium bg-slate-100 text-slate-600 px-2 py-1 rounded-full">${tag}</span>`).join('')}
             </div>
+            
+            <!-- Social action buttons for modal -->
+            <div class="mt-4 pt-3 border-t border-slate-200 flex justify-between">
+                <!-- Comments count button -->
+                <button class="modal-social-btn comment-modal-btn flex items-center text-slate-500 hover:text-green-500 transition-colors px-3 py-2 rounded-md hover:bg-slate-100" data-idea-id="${idea.id}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                    </svg>
+                    <span class="modal-comment-count text-sm">0</span>
+                    <span class="ml-1 text-sm">Comments</span>
+                </button>
+                
+                <!-- Share button -->
+                <button class="modal-social-btn share-modal-btn flex items-center text-slate-500 hover:text-purple-500 transition-colors px-3 py-2 rounded-md hover:bg-slate-100" data-idea-id="${idea.id}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                        <polyline points="16 6 12 2 8 6"></polyline>
+                        <line x1="12" y1="2" x2="12" y2="15"></line>
+                    </svg>
+                    <span class="text-sm">Share</span>
+                </button>
+            </div>
+            
+            <hr class="my-4">
+            <div id="comments-section" class="mt-4"></div>
+            <form id="comment-form" class="mt-2 flex gap-2" style="display:none;">
+                <input id="comment-input" type="text" class="flex-1 border rounded p-2" placeholder="Add a comment..." required />
+                <button type="submit" class="bg-sky-500 text-white px-4 py-2 rounded">Post</button>
+            </form>
         </div>
     `;
-
+    // Show comment form only if user is logged in
+    const userId = (typeof document !== 'undefined' && document.body && document.body.dataset.currentUser) ? document.body.dataset.currentUser : null;
+    if (userId) {
+        const form = document.getElementById('comment-form');
+        if (form) form.style.display = '';
+    }
+    // Dynamically import and render comments section
+    import('./comments_ui.js').then(mod => {
+        const userId = (typeof document !== 'undefined' && document.body && document.body.dataset.currentUser) ? document.body.dataset.currentUser : null;
+        const user = userId ? { id: userId } : null;
+        mod.renderCommentsSection(idea.id, user);
+        if (user) mod.setupCommentForm(idea.id, user);
+    });
+    
+    // Initialize modal social action buttons
+    initializeModalSocialButtons(idea);
+    
     modal.classList.add('active');
+}
 
+// Initialize social action buttons in the modal
+async function initializeModalSocialButtons(idea) {
+    try {
+        // Initialize comment count
+        const commentCount = await fetchCommentCount(idea.id);
+        const commentCountEl = document.querySelector('.modal-comment-count');
+        if (commentCountEl) commentCountEl.textContent = commentCount;
+        
+        // Get user info
+        const userId = document.body && document.body.dataset ? document.body.dataset.currentUser : null;
+        
+        // Comment button click - scroll to comments
+        const commentBtn = document.querySelector('.comment-modal-btn');
+        if (commentBtn) {
+            commentBtn.addEventListener('click', () => {
+                const commentsSection = document.getElementById('comments-section');
+                if (commentsSection) {
+                    commentsSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        }
+        
+        // Share button click
+        const shareBtn = document.querySelector('.share-modal-btn');
+        if (shareBtn) {
+            shareBtn.addEventListener('click', async () => {
+                // Try to use navigator.share if available
+                if (navigator.share) {
+                    try {
+                        await shareIdea(idea);
+                        showToast('Shared successfully!');
+                    } catch (error) {
+                        console.error('Error sharing idea:', error);
+                        fallbackToClipboardShare(idea.id);
+                    }
+                } else {
+                    // Fallback to clipboard copy
+                    fallbackToClipboardShare(idea.id);
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error initializing modal social buttons:', error);
+    }
 }
 
 // ui.js

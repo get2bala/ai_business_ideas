@@ -1,3 +1,12 @@
+# Comments table for idea feedback
+CREATE TABLE IF NOT EXISTS comments (
+  id SERIAL PRIMARY KEY,
+  idea_id INTEGER NOT NULL,
+  user_id VARCHAR(255) NOT NULL,
+  text TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (idea_id) REFERENCES ideas(id) ON DELETE CASCADE
+);
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
@@ -116,3 +125,26 @@ CREATE TABLE public.upvotes (
   CONSTRAINT upvotes_idea_id_fkey FOREIGN KEY (idea_id) REFERENCES public.ideas(id),
   CONSTRAINT upvotes_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );
+
+
+ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow select for authenticated users"
+ON comments
+FOR SELECT
+USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Allow insert for authenticated users"
+ON comments
+FOR INSERT
+WITH CHECK (auth.role() = 'authenticated' AND user_id = auth.uid());
+
+CREATE POLICY "Allow delete own comments"
+ON comments
+FOR DELETE
+USING (auth.role() = 'authenticated' AND user_id = auth.uid());
+
+CREATE POLICY "Allow update own comments"
+ON comments
+FOR UPDATE
+USING (auth.role() = 'authenticated' AND user_id = auth.uid());

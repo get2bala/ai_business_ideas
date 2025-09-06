@@ -139,9 +139,10 @@ function renderAuthUI() {
                 showApp();
                 document.dispatchEvent(new CustomEvent('generateAutoIdea'));
             });
+            // Open profile modal instead of redirect
             authSectionDesktop.querySelector('#profile-menu').addEventListener('click', (e) => {
                 e.preventDefault();
-                openLogoutModal();
+                if (window.openProfileModal) window.openProfileModal();
             });
             authSectionDesktop.querySelector('#logout-menu').addEventListener('click', async (e) => {
                 e.preventDefault();
@@ -168,9 +169,10 @@ function renderAuthUI() {
                 document.dispatchEvent(new CustomEvent('generateAutoIdea'));
                 if (mobileMenu) mobileMenu.classList.remove('active');
             });
+            // Open profile modal instead of redirect
             authSectionMobile.querySelector('#profile-menu-mobile').addEventListener('click', (e) => {
                 e.preventDefault();
-                openLogoutModal();
+                if (window.openProfileModal) window.openProfileModal();
                 if (mobileMenu) mobileMenu.classList.remove('active');
             });
             authSectionMobile.querySelector('#logout-menu-mobile').addEventListener('click', async (e) => {

@@ -211,8 +211,29 @@ document.addEventListener('DOMContentLoaded', () => {
     initAuth((user) => {
         // This function is called whenever auth state changes
         currentUser = user;
-    console.log('Auth state changed. currentUser:', currentUser);
+        console.log('Auth state changed. currentUser:', currentUser);
         renderApp(); // Re-render the UI with the correct user state
+        
+        // Check for idea ID in URL and open the corresponding modal
+        setTimeout(checkForIdeaInUrl, 500); // Small delay to ensure ideas are loaded
     });
     main();
 });
+
+// Check for idea ID in URL and open the corresponding modal
+function checkForIdeaInUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const ideaId = urlParams.get('idea');
+    
+    if (ideaId) {
+        // Find the idea in the database
+        const idea = ideasDatabase.find(i => String(i.id) === String(ideaId));
+        if (idea) {
+            // Import ui.js module to access openModal function
+            import('./ui.js').then(ui => {
+                // Open the modal for this idea
+                ui.openModal(idea);
+            });
+        }
+    }
+}
