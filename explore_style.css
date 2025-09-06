@@ -33,34 +33,51 @@
   max-width: calc(100% - 280px);
 }
 
-/* Mobile sidebar handling */
+/* Mobile navbar and sidebar handling */
 @media (max-width: 768px) {
+  /* Add mobile navbar to contain hamburger menu */
+  .mobile-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    z-index: 40;
+  }
+  
+  /* Style for the hamburger menu within navbar */
+  #sidebar-toggle-btn {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    box-shadow: none !important;
+    margin-right: 10px;
+  }
+  
   .explore-sidebar {
     transform: translateX(-100%);
     width: 250px;
+    top: 0;
+    padding-top: 70px; /* Add padding at the top for the mobile navbar */
+    z-index: 30; /* Ensure sidebar is above overlay but below navbar */
   }
   
   .explore-sidebar.active {
     transform: translateX(0);
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    display: block !important; /* Force display even if hidden class exists */
   }
   
   .explore-content {
     margin-left: 0;
     max-width: 100%;
     padding: 15px;
-  }
-  
-  .mobile-menu-btn {
-    display: flex;
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    z-index: 200;
-    background-color: white;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    padding: 8px;
-    cursor: pointer;
+    padding-top: 75px; /* Increased padding to account for navbar height */
   }
   
   .sidebar-overlay {
@@ -71,11 +88,22 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 90;
+    z-index: 25; /* Below sidebar (30) but above content */
   }
   
   .sidebar-overlay.visible {
     display: block;
+  }
+  
+  /* Custom class for sidebar overlay */
+  #sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 25; /* Below sidebar but above content */
   }
 }
 
@@ -291,6 +319,27 @@
   overflow: hidden;
   text-overflow: ellipsis;
   padding: 0 15px;
+  font-size: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .detail-header {
+    position: fixed;
+    top: 60px; /* Position below mobile navbar */
+    left: 0;
+    right: 0;
+    z-index: 20;
+  }
+  
+  .detail-header h1 {
+    font-size: 1rem;
+    max-width: 75%;
+    padding: 0 5px;
+  }
+  
+  #idea-detail-container .idea-content {
+    margin-top: 60px; /* Add margin to content to account for fixed header */
+  }
 }
 
 .idea-content {
@@ -307,25 +356,35 @@
   color: #3b82f6;
 }
 
-#back-to-list-btn {
+#back-button {
   display: flex;
   align-items: center;
   justify-content: center;
   color: #475569;
-  background: none;
-  border: none;
   cursor: pointer;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  padding: 8px 12px;
+  background-color: #f8fafc;
+  margin-bottom: 12px;
 }
 
-#back-to-list-btn:hover {
+#back-button:hover {
   background-color: #f1f5f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-#back-to-list-btn i {
+#back-button i {
   font-size: 1.25rem;
+  margin-right: 5px;
+}
+
+@media (max-width: 768px) {
+  #back-button {
+    position: relative;
+    z-index: 20; /* Make sure it's above other content but below the hamburger */
+    margin-top: 60px; /* Add margin to account for the fixed headers */
+  }
 }
 
 /* Comments section */

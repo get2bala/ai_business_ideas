@@ -259,6 +259,13 @@ function updateActiveFiltersDisplay() {
 
 // Initialize event listeners
 function initializeEventListeners() {
+    // Set initial state for mobile sidebar
+    const leftSidebar = document.getElementById('left-sidebar');
+    if (leftSidebar && window.innerWidth <= 768) {
+        leftSidebar.classList.add('hidden');
+        leftSidebar.classList.remove('active');
+    }
+    
     // Handle search input
     if (searchInput) {
         searchInput.addEventListener('input', handleSearchInput);
@@ -303,14 +310,14 @@ function initializeEventListeners() {
         });
     });
     
-    // Handle hamburger menu toggle
-    const hamburgerMenu = document.getElementById('hamburger-menu');
-    const sidebar = document.getElementById('left-sidebar'); // Corrected sidebar ID
+    // Handle hamburger menu toggle (sidebar toggle button)
+    const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
+    const sidebar = document.getElementById('left-sidebar'); // Sidebar ID
     
-    if (hamburgerMenu && sidebar) {
-        hamburgerMenu.addEventListener('click', () => {
+    if (sidebarToggleBtn && sidebar) {
+        sidebarToggleBtn.addEventListener('click', () => {
             sidebar.classList.toggle('hidden');
-            sidebar.classList.toggle('show-sidebar');
+            sidebar.classList.toggle('active'); // Use active class instead of show-sidebar
             
             // Toggle overlay
             toggleSidebarOverlay();
@@ -322,39 +329,42 @@ function initializeEventListeners() {
         // Only do this on mobile view
         if (window.innerWidth > 768) return;
         
-        const sidebar = document.getElementById('left-sidebar'); // Corrected sidebar ID
-        const hamburgerMenu = document.getElementById('hamburger-menu');
+        const sidebar = document.getElementById('left-sidebar');
         const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
         
+        // Check if click is outside sidebar and toggle button, and sidebar is active
         if (sidebar && 
-            ((hamburgerMenu && !hamburgerMenu.contains(e.target)) || 
-             (sidebarToggleBtn && !sidebarToggleBtn.contains(e.target))) && 
+            sidebarToggleBtn && !sidebarToggleBtn.contains(e.target) && 
             !sidebar.contains(e.target) && 
-            (sidebar.classList.contains('show-sidebar') || sidebar.classList.contains('active'))) {
+            sidebar.classList.contains('active')) {
             
-            sidebar.classList.toggle('hidden');
-            sidebar.classList.toggle('active'); // Use 'active' class as per CSS
+            sidebar.classList.add('hidden');
+            sidebar.classList.remove('active');
             
-            // Toggle overlay
-            toggleSidebarOverlay();
+            // Remove any overlay
+            const overlay = document.getElementById('sidebar-overlay');
+            if (overlay) overlay.remove();
         }
     });
     
     // Handle window resize to show/hide sidebar appropriately
     window.addEventListener('resize', () => {
-        const sidebar = document.getElementById('left-sidebar'); // Corrected sidebar ID
+        const sidebar = document.getElementById('left-sidebar');
         
         if (sidebar) {
             if (window.innerWidth > 768) {
+                // On desktop/tablet: always show sidebar
                 sidebar.classList.remove('active');
-                sidebar.classList.remove('show-sidebar');
                 sidebar.classList.remove('hidden');
                 
                 // Remove overlay if exists
                 const overlay = document.getElementById('sidebar-overlay');
                 if (overlay) overlay.remove();
-            } else if (!sidebar.classList.contains('active') && !sidebar.classList.contains('show-sidebar')) {
-                sidebar.classList.add('hidden');
+            } else {
+                // On mobile: hide sidebar by default unless it's currently active
+                if (!sidebar.classList.contains('active')) {
+                    sidebar.classList.add('hidden');
+                }
             }
         }
     });
@@ -368,7 +378,9 @@ function initializeEventListeners() {
     
     // Add specific event handler for the sidebar toggle button
 if (sidebarToggleBtn) {
-    sidebarToggleBtn.addEventListener('click', () => {
+    sidebarToggleBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         const sidebar = document.getElementById('left-sidebar');
         if (sidebar) {
             sidebar.classList.toggle('hidden');
@@ -473,24 +485,23 @@ if (sidebarToggleBtn) {
 // Toggle sidebar overlay
 function toggleSidebarOverlay() {
     const overlay = document.getElementById('sidebar-overlay');
-    const sidebar = document.getElementById('left-sidebar'); // Corrected sidebar ID
+    const sidebar = document.getElementById('left-sidebar');
     
     if (overlay) {
         overlay.remove();
     } else {
         const newOverlay = document.createElement('div');
         newOverlay.id = 'sidebar-overlay';
-        newOverlay.className = 'fixed inset-0 bg-black bg-opacity-50 z-10';
+        newOverlay.className = 'fixed inset-0 bg-black bg-opacity-50';
         document.body.appendChild(newOverlay);
         
         newOverlay.addEventListener('click', () => {
             if (sidebar) {
-                sidebar.classList.toggle('hidden');
-                if (sidebar.classList.contains('explore-sidebar')) {
-                    sidebar.classList.toggle('active');
-                } else {
-                    sidebar.classList.toggle('show-sidebar');
-                }
+                sidebar.classList.remove('active');
+                // Add hidden class after a short delay to allow transition
+                setTimeout(() => {
+                    sidebar.classList.add('hidden');
+                }, 300);
             }
             newOverlay.remove();
         });
@@ -1219,11 +1230,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Set up sidebar toggle explicitly
         const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
         if (sidebarToggleBtn) {
-            sidebarToggleBtn.addEventListener('click', () => {
+            sidebarToggleBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 const sidebar = document.getElementById('left-sidebar');
                 if (sidebar) {
-                    sidebar.classList.toggle('hidden');
-                    sidebar.classList.toggle('active');
+                    // First, make sure it's not hidden if we're going to show it
+                    if (sidebar.classList.contains('hidden')) {
+                        sidebar.classList.remove('hidden');
+                        // Use a small timeout to ensure CSS transitions work
+                        setTimeout(() => {
+                            sidebar.classList.add('active');
+                        }, 10);
+                    } else {
+                        // If it's already visible, hide it
+                        sidebar.classList.remove('active');
+                        // Add hidden class after transition
+                        setTimeout(() => {
+                            sidebar.classList.add('hidden');
+                        }, 300);
+                    }
                     toggleSidebarOverlay();
                 }
             });

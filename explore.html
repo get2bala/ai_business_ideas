@@ -16,14 +16,19 @@
     <main class="pt-0">
         <!-- Main explore container with Reddit-like layout -->
         <div class="explore-container">
-            <!-- Mobile sidebar toggle button (only visible on mobile) -->
-            <button id="sidebar-toggle-btn" class="md:hidden p-2 fixed top-4 left-4 z-30 rounded-md text-slate-600 hover:text-slate-800 hover:bg-slate-200 focus:outline-none bg-white shadow-md">
-                <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-                </svg>
-            </button>
+            <!-- Mobile navbar (only visible on mobile) -->
+            <div class="mobile-navbar md:hidden">
+                <!-- Mobile sidebar toggle button -->
+                <button id="sidebar-toggle-btn" class="p-3 rounded-md text-slate-700 hover:text-slate-900 hover:bg-slate-200 focus:outline-none">
+                    <svg class="h-7 w-7" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+                <h1 class="text-xl font-bold">Genesis AI</h1>
+            </div>
+            
             <!-- Left sidebar for filtering and navigation (starts hidden on mobile) -->
-            <div class="explore-sidebar" id="left-sidebar">
+            <div class="explore-sidebar md:block hidden" id="left-sidebar">
                 <!-- User profile section -->
                 <div class="sidebar-profile mb-6">
                     <div id="user-profile-section" class="flex items-center cursor-pointer p-3 rounded-lg hover:bg-slate-100">
@@ -155,8 +160,8 @@
 
                 <!-- Idea detail view (initially hidden) -->
                 <div id="idea-detail-container" style="display: none;">
-                    <div class="mb-4">
-                        <button id="back-button" class="flex items-center text-slate-600 hover:text-slate-900 transition-colors">
+                    <div class="mb-4 md:ml-0 ml-12"> <!-- Added margin-left on mobile -->
+                        <button id="back-button" class="flex items-center text-slate-600 hover:text-slate-900 transition-colors px-3 py-2 bg-white rounded-md shadow-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
                             </svg>

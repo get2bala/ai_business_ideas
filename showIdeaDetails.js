@@ -59,16 +59,16 @@ export async function showIdeaDetails(idea, focusSection = null) {
     detailContainer.innerHTML = `
         <div class="detail-view">
             <div class="detail-header sticky top-0 bg-white z-10 py-3 border-b border-gray-200">
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between px-2">
                     <button id="back-to-list-btn" class="flex items-center text-gray-600 hover:text-blue-600 transition-colors">
                         <i class="fas fa-arrow-left"></i>
                     </button>
-                    <h1 class="text-2xl font-bold truncate">${idea.title}</h1>
+                    <h1 class="text-2xl font-bold">${idea.title}</h1>
                     <div class="w-6"></div> <!-- Empty space for balance -->
                 </div>
             </div>
             
-            <div class="idea-content mt-4">
+            <div class="idea-content mt-4 px-4">
                 <div class="text-sm text-gray-500 mb-4">
                     Posted by <span class="font-medium">${idea.username || 'anonymous'}</span>
                     ${idea.timestamp ? ` • ${formatDate(new Date(idea.timestamp))}` : ''}
